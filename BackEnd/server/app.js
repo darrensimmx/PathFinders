@@ -1,36 +1,40 @@
-//app.js decides where each requests go: for now only have route.js 
+// BackEnd/server/app.js
 
-const express = require('express') //load express lib to use for NodeJs
+import express from 'express';
+import cors from 'cors';
 
-const cors = require('cors') //loads Cross Origin Resource Sharing to connect front and back that are running on different ports
+// (If you have route-generation logic in another file, import it here)
+// import generateRoute from './utils/generateRoute.js';
 
-const router = require('./routes/route')
+const app = express();
+const PORT = process.env.PORT || 4000;
 
-const app = express()
-const PORT = process.env.PORT || 3001; // cannot set to frontend port as port can only run one server
+// 1) Enable CORS so your React app can call us
+app.use(cors());
 
-//app can now access cors and auto parse JSON files
-app.use(cors())
-app.use(express.json())
+// 2) Parse JSON bodies
+app.use(express.json());
 
-app.use('/generateRoute', router) //frontend use /generateRoute, will direct to router's generate
-
-app.get('/ping', (req, res) => {
-  res.send('pong');
+// 3) Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK' });
 });
-//Starts server on port and logs onto terminal
+
+// 4) Route-generation endpoint
+app.post('/api/route', (req, res) => {
+  const { start, end, distance } = req.body;
+
+  // TODO: replace this stub with your real algorithm
+  // For now we return a little straight-line path
+  const coords = [
+    [1.3521, 103.8198],
+    [1.3550, 103.8200],
+    [1.3580, 103.8250],
+  ];
+
+  res.json({ coords });
+});
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-  
-//The part below is a checker for invalid JSON inputs that are not taken into account
-app.use((err, req, res, next) => {
-  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-    return res.status(400).json({ success: false, message: "Malformed JSON in request body." });
-  }
-
-  // fallback
-  console.error(err.stack);
-  res.status(500).json({ success: false, message: "Something went wrong." });
+  console.log(`🚀 Server listening on http://localhost:${PORT}`);
 });
