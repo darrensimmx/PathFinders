@@ -10,17 +10,27 @@ const app = express()
 const PORT = process.env.PORT || 3001; // cannot set to frontend port as port can only run one server
 
 //app can now access cors and auto parse JSON files
-app.use(cors)
+app.use(cors())
 app.use(express.json())
 
 app.use('/generateRoute', router) //frontend use /generateRoute, will direct to router's generate
 
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
 //Starts server on port and logs onto terminal
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
   
-  app.get('/ping', (req, res) => {
-    res.send('pong');
-  });
-  
+//The part below is a checker for invalid JSON inputs that are not taken into account
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ success: false, message: "Malformed JSON in request body." });
+  }
+
+  // fallback
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: "Something went wrong." });
+});
