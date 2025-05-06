@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Make the page fill the viewport and disable page scrolling */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Flex container: sidebar + map */
+.app-container {
+  display: flex;
+  height: 100%;
+}
+
+/* Sidebar styling */
+.sidebar {
+  width: 20rem;              /* 320px */
+  background-color: #F9FAFB; /* Tailwind bg-gray-50 */
+  padding: 1.5rem;           /* Tailwind p-6 */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow-y: auto;
+}
+
+/* Map wrapper must be relative so child MapContainer can fill it */
+.map-wrapper {
+  flex: 1;
+  position: relative;
+}
+
