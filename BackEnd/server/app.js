@@ -1,5 +1,28 @@
 // BackEnd/server/app.js
 
+const express = require('express');
+const cors = require('cors');
+const routeRouter = require('./routes/route');
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+app.use(cors());
+app.use(express.json());
+
+// Health check route (optional)
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK' });
+});
+
+// Main route handler
+app.use('/generateRoute', routeRouter);
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:4000`);
+});
+
+/* ESM version 
 import express from 'express';
 import cors from 'cors';
 
@@ -38,3 +61,4 @@ app.post('/api/route', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server listening on http://localhost:${PORT}`);
 });
+*/
