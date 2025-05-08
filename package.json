@@ -2,12 +2,15 @@
     "name": "pathfinders-monorepo",
     "private": true,
     "scripts": {
-      "dev:backend":  "npm --prefix BackEnd/server run dev",
-      "dev:frontend": "npm --prefix client           run dev",
-      "start":        "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+        "dev:backend": "npm --prefix BackEnd/server run dev",
+        "dev:frontend": "npm --prefix client           run dev",
+        "start": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
     },
     "devDependencies": {
-      "concurrently": "^7.6.0"
+        "concurrently": "^7.6.0"
+    },
+    "dependencies": {
+        "axios": "^1.9.0",
+        "dotenv": "^16.5.0"
     }
-  }
-  
+}
