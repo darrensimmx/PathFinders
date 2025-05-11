@@ -20,12 +20,12 @@ Current Progress:
 3. **Run the Project**
    In seperate terminals:
    - FrontEnd
-     cd client
-     npm run dev
+     - cd client
+     - npm run dev
    - BackEnd
-     cd BackEnd/server
-     npm run dev
-     npm install node-fetch@2
+     - cd BackEnd/server
+     - npm run dev
+     - npm install node-fetch@2
 
 
 
