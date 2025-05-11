@@ -1,0 +1,35 @@
+/* client/src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fill viewport and disable page scroll */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Flex layout: sidebar + map */
+.app-container {
+  display: flex;
+  height: 100%;
+}
+
+/* Darker sidebar */
+.sidebar {
+  width: 20rem;               /* 320px */
+  background-color: #1F2937;  /* Tailwind bg-gray-800 */
+  color: #F3F4F6;             /* Tailwind text-gray-100 */
+  padding: 1.5rem;            /* Tailwind p-6 */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow-y: auto;
+}
+
+/* Map wrapper must be relative for absolute child */
+.map-wrapper {
+  flex: 1;
+  position: relative;
+}
+
