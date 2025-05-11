@@ -25,6 +25,9 @@ Current Progress:
    - BackEnd
      cd BackEnd/server
      npm run dev
+     npm install node-fetch@2
+
+
 
 **Local Host**
 FrontEnd should run on localhost:5173 while BackEnd runs on localhost:4000 
