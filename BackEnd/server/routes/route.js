@@ -34,6 +34,22 @@ router.post('/', (req, res) => {
     try {
       const startCoords = await geocodeLocation(start);
       const endCoords = await geocodeLocation(end);
+
+      //check validity of user inputs 
+      if (!startCoords || startCoords.length != 2) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "We couldn't find the starting location. Please try a more specific address." 
+        });
+      } // valid start and start has length two, [lng, lat]
+
+      if (!endCoords || endCoords.length != 2) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "We couldn't find the ending location. Please try a more specific address." 
+        });
+      } // valid start and start has length two, [lng, lat]
+
       
       const geoData = await getORSRoute(startCoords, endCoords);
       console.log("ORS response received:", geoData); //debug

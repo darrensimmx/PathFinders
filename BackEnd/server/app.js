@@ -7,7 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 // If you have additional route handlers in routes/route.js, uncomment below:
-// const routeRouter = require('./routes/route');
+const routeRouter = require('./routes/route');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -59,7 +59,7 @@ app.post('/api/route', async (req, res) => {
 });
 
 // If you have routers defined in ./routes/route.js, you can mount them:
-// app.use('/generateRoute', routeRouter);
+app.use('/generateRoute', routeRouter);
 
 // Start the server\app.listen(PORT, () => {
 app.listen(PORT, () => {

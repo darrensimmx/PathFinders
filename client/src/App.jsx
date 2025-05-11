@@ -1,6 +1,7 @@
 // client/src/App.jsx
 
 import React, { useState } from 'react';
+import { geocode } from '../utils/geocode.js';
 import RouteForm from './components/RouteForm.jsx';
 import RouteMap from './components/RouteMap.jsx';
 import './index.css';
@@ -8,29 +9,47 @@ import './index.css';
 export default function App() {
   const [coords, setCoords] = useState(null);
 
-  function handleGenerate({ start, end, distance }) {
+  function handleGenerate({ start, end, distance }) { // omitted distance for now
     // TODO: wire up to your backend
     console.log("sent request to backend")
-    console.log("JSON.stringify exists:", typeof JSON.stringify);
+    console.log("⬆Sending payload:", { start, end, distance });
 
-    fetch("http://localhost:4000/generateRoute", {
+
+    fetch("http://localhost:4000/generateRoute/real", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: 
-        JSON.stringify({ start, end , distance: Number(distance) })
+        JSON.stringify({ start, end })
       })
             .then(res => res.json())
             .then(data => {
               if (data.success) {
-                console.log("Received response from backend: ", data.route)
-                // To be replaced with routing logic later
-                setCoords([
-                  [1.3521, 103.8198],
-                  [1.3550, 103.8200],
-                  [1.3580, 103.8250]
-                ])
+                console.log("Received goecodejson response from backend: ", data.geojson)
+                
+                //routing logic
+                if ( !data.geojson ||
+                  !data.geojson.features ||
+                  !data.geojson.features[0] ||
+                  !data.geojson.features[0].geometry ||
+                  !data.geojson.features[0].geometry.coordinates) {
+                  console.error("geojson or coordinates missing in response:", data);
+                  return;
+                }                
+                const coordinates = data.geojson.features[0].geometry.coordinates;
+
+                // debugging: to make sure it is actual route with many intermediate points (if not straight line)
+                if (coordinates.length < 3) {
+                  console.warn("⚠️ Possibly unrunnable route: too few points");
+                }
+                
+
+                const coords = coordinates.map( // extract relevant part from geojson response
+                  ([lng, lat]) => [lat, lng] // change to Leaflet format
+                );
+                setCoords(coords);
+
               } else {
                 console.log("Backend rejected input: ", data.message)
               }
