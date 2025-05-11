@@ -12,5 +12,19 @@
     "dependencies": {
         "axios": "^1.9.0",
         "dotenv": "^16.5.0"
-    }
+    },
+    "version": "1.0.0",
+    "description": "Generate suitable running routes based on user preferences, customized to individual users",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/darrensimmx/PathFinders.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/darrensimmx/PathFinders/issues"
+    },
+    "homepage": "https://github.com/darrensimmx/PathFinders#readme"
 }
