@@ -1,19 +1,12 @@
 //Handles the actual response logic for each API call
 const express = require('express')
 const router = express.Router() //creates an instances of Router to be used in app.js
-const validateRouteInput = require('../utils/validateInput')
 const getORSRoute = require('../utils/orsRequest');
 const geocodeLocation = require('../utils/geocodeLocation');
 
 // /generateRoute Debugger
 router.post('/', (req, res) => {
     const { start, end, distance } = req.body; //only data that we need for now
-
-    const { valid, message} = validateRouteInput({ start, end, distance })
-
-    if (!valid) {
-      return res.status(400).json({ success: false, message })
-    }
   
     console.log("Received from frontend:", { start, end, distance }); //debugging
   
@@ -29,7 +22,15 @@ router.post('/', (req, res) => {
 
   //test the ORSAPI
   router.post('/real', async (req, res) => {
-    const { start, end } = req.body;
+    const { start, end, distance } = req.body;
+
+  //   // Distance check : undo when done
+  //   if (typeof distance !== 'number' || isNaN(distance) || distance <= 0) {
+  //     return res.status(400).json({
+  //       success: false,
+  //       message: 'Please enter a valid positive number for distance.'
+  //     });
+  // }
   
     try {
       const startCoords = await geocodeLocation(start);
