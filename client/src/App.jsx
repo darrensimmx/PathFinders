@@ -1,5 +1,3 @@
-// client/src/App.jsx
-
 import React, { useState } from 'react';
 import { geocode } from '../utils/geocode.js';
 import RouteForm from './components/RouteForm.jsx';
@@ -8,56 +6,38 @@ import './index.css';
 
 export default function App() {
   const [coords, setCoords] = useState(null);
+  const [routeDistance, setRouteDistance] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  function handleGenerate({ start, end, distance }) { // omitted distance for now
-    // TODO: wire up to your backend
-    console.log("sent request to backend")
-    console.log("⬆Sending payload:", { start, end, distance });
+  async function handleGenerate({ start, end, distance }) {
+    setLoading(true);
+    setError(null);
 
+    try {
+      // Geocode if inputs are strings
+      const startCoords = typeof start === 'string' ? await geocode(start) : start;
+      const endCoords   = typeof end   === 'string' ? await geocode(end)   : end;
 
-    fetch("http://localhost:4000/generateRoute/real", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: 
-        JSON.stringify({ start, end })
-      })
-            .then(res => res.json())
-            .then(data => {
-              if (data.success) {
-                console.log("Received goecodejson response from backend: ", data.geojson)
-                
-                //routing logic
-                if ( !data.geojson ||
-                  !data.geojson.features ||
-                  !data.geojson.features[0] ||
-                  !data.geojson.features[0].geometry ||
-                  !data.geojson.features[0].geometry.coordinates) {
-                  console.error("geojson or coordinates missing in response:", data);
-                  return;
-                }                
-                const coordinates = data.geojson.features[0].geometry.coordinates;
+      const res = await fetch('/api/route', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ start: startCoords, end: endCoords, distance })
+      });
 
-                // debugging: to make sure it is actual route with many intermediate points (if not straight line)
-                if (coordinates.length < 3) {
-                  console.warn("⚠️ Possibly unrunnable route: too few points");
-                }
-                
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
 
-                const coords = coordinates.map( // extract relevant part from geojson response
-                  ([lng, lat]) => [lat, lng] // change to Leaflet format
-                );
-                setCoords(coords);
+      const { geojson, distance: actualDist } = await res.json();
+      const latLngs = geojson.coordinates.map(([lng, lat]) => [lat, lng]);
 
-              } else {
-                console.log("Backend rejected input: ", data.message)
-              }
-            })
-            .catch(err => {
-              console.error("Fetch failed: ", err)
-            })
-    console.log("handleGenerate() called") //debug
+      setCoords(latLngs);
+      setRouteDistance(actualDist);
+    } catch (err) {
+      console.error('Fetch failed:', err);
+      setError('Could not generate route.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -66,25 +46,23 @@ export default function App() {
         <h1 className="text-3xl font-extrabold mb-2">PathFinders</h1>
         <p className="text-sm text-gray-300 mb-6">
           By{' '}
-          <a
-            href="https://github.com/darrensimmx"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
+          <a href="https://github.com/darrensimmx" target="_blank" rel="noopener noreferrer" className="underline">
             @darrensimmx
           </a>{' '}
           and{' '}
-          <a
-            href="https://github.com/RishabhShenoy03"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-           @RishabhShenoy03
+          <a href="https://github.com/RishabhShenoy03" target="_blank" rel="noopener noreferrer" className="underline">
+            @RishabhShenoy03
           </a>
         </p>
+
         <RouteForm onGenerate={handleGenerate} />
+        {loading && <p className="mt-4 text-blue-500">Generating route…</p>}
+        {error   && <p className="mt-4 text-red-400">{error}</p>}
+        {routeDistance !== null && (
+          <p className="mt-2 text-gray-700">
+            Your route is {Math.round(routeDistance)} meters long.
+          </p>
+        )}
       </aside>
       <main className="map-wrapper">
         <RouteMap routeCoords={coords} />
@@ -92,4 +70,3 @@ export default function App() {
     </div>
   );
 }
-
