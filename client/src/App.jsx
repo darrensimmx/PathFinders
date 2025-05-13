@@ -41,7 +41,7 @@ export default function App() {
 
     // 3) Request route from backend
     try {
-      const res = await fetch('/api/route', {
+      const res = await fetch('http://localhost:4000/api/route', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ start, end, distance })
