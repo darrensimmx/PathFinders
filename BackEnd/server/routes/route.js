@@ -24,13 +24,13 @@ router.post('/', (req, res) => {
   router.post('/real', async (req, res) => {
     const { start, end, distance } = req.body;
 
-  //   // Distance check : undo when done
-  //   if (typeof distance !== 'number' || isNaN(distance) || distance <= 0) {
-  //     return res.status(400).json({
-  //       success: false,
-  //       message: 'Please enter a valid positive number for distance.'
-  //     });
-  // }
+    // Distance check : undo when done
+    if (typeof distance !== 'number' || isNaN(distance) || distance <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid positive number for distance.'
+      });
+  }
   
     try {
       const startCoords = await geocodeLocation(start);
