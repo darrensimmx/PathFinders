@@ -4,10 +4,11 @@ export default function RouteForm({ onGenerate }) {
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [distance, setDistance] = useState('');
+  const [routeType, setRouteType] = useState('loop') //default set to loop
 
   function handleSubmit(e) {
     e.preventDefault();
-    onGenerate({ start, end, distance });
+    onGenerate({ start, end, distance, routeType });
   }
 
   return (
@@ -38,7 +39,8 @@ export default function RouteForm({ onGenerate }) {
           onChange={e => setEnd(e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 bg-gray-700 text-white"
           placeholder="Enter address or postal code"
-          required
+          disabled={routeType === 'loop'}        // disable when loop
+          required={routeType === 'direct'}      // required only when direct
         />
       </div>
 
@@ -56,6 +58,22 @@ export default function RouteForm({ onGenerate }) {
           placeholder="e.g. 5.2"
           required
         />
+      </div>
+
+      {/* Route Type Toggle */}
+      <div>
+        <label htmlFor="routeType" className="block text-sm font-medium text-white">
+          Route type
+        </label>
+        <select
+          id="routeType"
+          value={routeType}
+          onChange={e => setRouteType(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 bg-gray-700 text-white"
+        >
+          <option value="loop">Loop (start and end same)</option>
+          <option value="direct">Point-to-point (A to B)</option>
+        </select>
       </div>
 
       <button

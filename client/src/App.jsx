@@ -11,7 +11,7 @@ export default function App() {
   const [loading, setLoading]             = useState(false);
   const [error, setError]                 = useState(null);
 
-  async function handleGenerate({ start: startInput, end: endInput, distance }) {
+  async function handleGenerate({ start: startInput, end: endInput, distance, routeType }) {
     // Reset UI
     setLoading(true);
     setError(null);
@@ -22,7 +22,15 @@ export default function App() {
     // 1) Geocode start
     let start;
     try {
-      start = await geocode(startInput);
+      if (startInput && typeof startInput === 'object' &&
+        typeof startInput.lat === 'number' &&
+        typeof startInput.lng === 'number') {
+          start = startInput
+        } else if (typeof startInput == 'string') {
+        start = await geocode(startInput);  
+      } else {
+        throw new Error('invalid start input: ${JSON.stringify(startInput)}')
+      }
     } catch (e) {
       setError(`Invalid starting location: ${e.message}`);
       setLoading(false);
@@ -31,20 +39,37 @@ export default function App() {
 
     // 2) Geocode end
     let end;
-    try {
-      end = await geocode(endInput);
-    } catch (e) {
-      setError(`Invalid ending location: ${e.message}`);
-      setLoading(false);
-      return;
+    if (routeType !== 'loop') {
+      try {
+        if (endInput && typeof endInput === 'object' &&
+          typeof endInput.lat === 'number' &&
+          typeof endInput.lng === 'number') {
+            end = endInput
+          } else if (typeof endInput == 'string') {
+          end = await geocode(endInput);
+        } else {
+          throw new Error('invalid end input: ${JSON.stringify(endInput)}')
+        }
+      } catch (e) {
+        setError(`Invalid ending location: ${e.message}`);
+        setLoading(false);
+        return;
+      }
     }
 
-    // 3) Request route from backend
+    // 3) Choose backend based on routeType
+    const isLoop = routeType == 'loop'
+    const url = 'http://localhost:4000/api/route'
+    const payLoad = isLoop
+                  ? {start, distance, routeType}
+                  : {start, end, distance, routeType};
+
+    // 4) Request route from backend
     try {
-      const res = await fetch('http://localhost:4000/api/route', {
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ start, end, distance })
+        body: JSON.stringify(payLoad)
       });
       if (!res.ok) {
         const text = await res.text();
@@ -69,7 +94,9 @@ export default function App() {
         );
       } else {
         setRouteMessage(
-          `Generated a ${(actualDist / 1000).toFixed(2)} km route between ${startInput} and ${endInput}`
+          isLoop 
+          ? `Generated a ${(actualDist / 1000).toFixed(2)} km route around ${startInput}`
+          : `Generated a ${(actualDist / 1000).toFixed(2)} km route between ${startInput} and ${endInput}`
         );
       }
     } catch (e) {
