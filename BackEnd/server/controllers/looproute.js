@@ -1,8 +1,10 @@
 //Backend/server/controllers/loopRoute.js
 
-const axios = require('axios')
 require('dotenv').config();
-const ORS_KEY = process.env.ORS_API_KEY;
+const axios = require('axios');
+const polyline = require('@mapbox/polyline');
+const GOOGLE_KEY = process.env.GOOGLE_API_KEY;
+//const ORS_KEY = process.env.ORS_API_KEY; no longer in use
 
 // Convert metres to degrees latitude/longitude at a given latitude
 function metreToDeg(m, lat) {
@@ -17,9 +19,81 @@ function rectangleCorners(origin, dh, dw, signH, signW) {
   const B = { lat: origin.lat + dh * signH, lng: origin.lng };
   const C = { lat: B.lat,           lng: origin.lng + dw * signW };
   const D = { lat: origin.lat,      lng: origin.lng + dw * signW };
-  return [A, B, C, D, A];
+  return [A, B, C, D];
 }
 
+async function snapLoop(start, end, dh, dw, signH, signW) {
+  const corners = rectangleCorners(start, dh, dw, signH, signW);
+  const originStr = `${start.lat},${start.lng}`;
+  const destStr   = `${end.lat},${end.lng}`;
+  const waypoints = corners.slice(1).map(c => `${c.lat},${c.lng}`).join('|');
+
+  const url = 'https://maps.googleapis.com/maps/api/directions/json';
+  const resp = await axios.get(url, {
+    params: {
+      origin: originStr,
+      destination: destStr,
+      waypoints,
+      mode: 'walking',
+      key: GOOGLE_KEY
+    }
+  });
+
+  if (!resp.data.routes.length) {
+    throw new Error('No route from Google');
+  }
+
+  const raw = resp.data.routes[0].overview_polyline.points;
+  const latlngs = polyline.decode(raw); // [[lat, lng], ...]
+  const coords = latlngs.map(([lat, lng]) => [lng, lat]);
+
+  const dist = resp.data.routes[0].legs
+    .reduce((sum, leg) => sum + leg.distance.value, 0);
+
+  return { coords, dist };
+}
+
+async function generateLoopRoute(start, distance, options = {}) { //added returnCorners for any fn that needs loop to do that
+  const totalM = distance * 1000;
+  const h = ((Math.random() + 1) / 2) * (totalM / 4);
+  const w = totalM / 2 - h;
+  const { dLat: dh, dLng: dw } = metreToDeg(h, start.lat);
+
+  let best = { error: Infinity, route: null };
+
+  for (const signH of [-1, 1]) {
+    for (const signW of [-1, 1]) {
+      try {
+        const corners = rectangleCorners(start, dh, dw, signH, signW);
+        const { coords, dist } = await snapLoop(start, start, dh, dw, signH, signW);
+        const error = Math.abs(dist - totalM);
+        if (error < best.error) {
+          best = { error, route: { coords, dist }, corners };
+        }
+      } catch (e) {
+        console.warn(`Orientation (${signH},${signW}) failed:`, e.message);
+      }
+    }
+  }
+
+  if (!best.route) {
+    throw new Error('No valid rectangle route found');
+  }
+
+  const [A, B, C, D] = best.corners || [];
+  //console.log("corners are:", A, B, C, D)
+  return {
+    type: 'rect-loop',
+    geojson: { type: 'LineString', coordinates: best.route.coords },
+    distance: best.route.dist,
+            ...(options?.returnCorners && {corners: {A, B, C, D}})
+  };
+}
+
+module.exports = generateLoopRoute;
+
+
+/* this is old API call for openRouteAPI
 // Snap a segment via ORS and return { coords, dist }
 async function snapSegment(a, b) {
   const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
@@ -68,5 +142,4 @@ async function generateLoopRoute(start, distance) {
       distance: best.route.dist
     };
   }
-  
-module.exports = generateLoopRoute;
+*/

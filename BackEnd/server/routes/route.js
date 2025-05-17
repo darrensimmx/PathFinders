@@ -1,8 +1,9 @@
+//Backend/server/routes/route.js
 //Handles the actual response logic for each API call
 const express = require('express')
 const router = express.Router() //creates an instances of Router to be used in app.js
-const getORSRoute = require('../utils/orsRequest');
-const geocodeLocation = require('../utils/geocodeLocation');
+//const getORSRoute = require('../utils/orsRequest');
+//const geocodeLocation = require('../utils/geocodeLocation');
 const generateLoopRoute = require('../controllers/looproute')
 const generateDirectRoute = require('../controllers/directRoute');
 
@@ -39,6 +40,7 @@ router.post('/', async (req, res) => {
 
     let result;
     console.log('[Route Debug] routeType received:', routeType); //debug
+    attempts = 0 // run the algo fresh
 
     if (routeType == 'loop') {
       result = await generateLoopRoute(startCoords, distNum);
@@ -51,7 +53,7 @@ router.post('/', async (req, res) => {
           message: "We couldn't find the ending location. Please try a more specific address." 
         });
       } // valid end and end has length two, [lng, lat]
-      result = await generateDirectRoute(startCoords, endCoords);
+      result = await generateDirectRoute(startCoords, endCoords, distNum);
     }
 
     res.json({ success: true, ...result });
