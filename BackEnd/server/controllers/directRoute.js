@@ -31,6 +31,38 @@ async function getSegmentDistance(from, to) {
 async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { error: Infinity, route: null }) {
   const baseM = targetKm * 1000;
 
+  //Step 0: Check if distance input is lesser than shortest distance
+  const shortestUrl = 'https://maps.googleapis.com/maps/api/directions/json';
+  const shortestResp = await axios.get(shortestUrl, {
+    params: {
+      origin: `${start.lat},${start.lng}`,
+      destination: `${end.lat},${end.lng}`,
+      mode: 'walking',
+      key: GOOGLE_KEY
+    }
+  });
+
+  if (!shortestResp.data.routes.length) {
+    throw new Error('No shortest path found from start to end');
+  }
+
+  const shortestDist = shortestResp.data.routes[0].legs[0].distance.value; // in meters
+
+  // Step 0.5: Compare and override if needed
+  let warning = null;
+  if (baseM < shortestDist) {
+    const raw = shortestResp.data.routes[0].overview_polyline.points;
+    const latlngs = polyline.decode(raw);
+    const coords = latlngs.map(([lat, lng]) => [lng, lat]);
+
+    return {
+      type: 'shortest',
+      geojson: { type: 'LineString', coordinates: coords },
+      distance: shortestDist,
+      warning: `Minimum possible walking route is ${(shortestDist / 1000).toFixed(2)} km. Using closest available route instead.`
+    };
+  }
+
   // Step 1: Generate a loop route with corners to extract D → A
   const loopData = await generateLoopRoute(start, targetKm, { returnCorners: true });
   const { A, B, C, D } = loopData.corners;

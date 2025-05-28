@@ -68,24 +68,3 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
-
-/*
-  //test the ORSAPI and working ORS API already
-  router.post('/real', async (req, res) => {
-    const { start, end } = req.body;
-  
-    try {
-      // Dummy coordinates for now — replace with real geocoded coords
-      const startCoords = [103.9535, 1.3419];  // Simei
-      const endCoords = [103.9455, 1.3536];    // Tampines
-  
-      const geoData = await getORSRoute(startCoords, endCoords);
-      console.log("ORS response received:", geoData); //debug
-
-      res.json({ success: true, geojson: geoData });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ success: false, message: 'Route generation failed' });
-    }
-  });
-*/
