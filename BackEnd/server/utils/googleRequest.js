@@ -2,6 +2,7 @@
 require('dotenv').config();
 const axios = require('axios')
 const GOOGLE_KEY = process.env.GOOGLE_API_KEY
+const polyline = require('@mapbox/polyline');
 
 /**
  * Get walking route with optional waypoints from Google Directions API.
@@ -23,14 +24,16 @@ async function getWalkingRoute(origin, destination, waypoints = []) {
     }
 
     const resp = await axios.get('https://maps.googleapis.com/maps/api/directions/json', { params });
+    //console.log("ans: ",JSON.stringify(resp.data, null, 2)); // Pretty print
 
     if (!resp.data.routes.length) throw new Error('No route returned from Google');
 
     const route = resp.data.routes[0];
     const coords = polyline.decode(route.overview_polyline.points).map(([lat, lng]) => [lng, lat]);
     const dist = route.legs.reduce((sum, leg) => sum + leg.distance.value, 0);
+    const warnings = route.warnings || [];
 
-    return { coords, dist };
+    return { coords, dist, warnings };
   } catch (err) {
     console.error('getWalkingRoute error:', err.message);
     return null;
@@ -71,6 +74,6 @@ async function snapToWalkingPath(lat, lng) {
 
 
 module.exports = {
-    getWalkingRoute,
-    snapToWalkingPath
+  getWalkingRoute,
+  snapToWalkingPath
 };

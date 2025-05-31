@@ -1,11 +1,9 @@
 //utils/routeTools.js for common fns to generate route
 
-const axios = require('axios');
-const polyline = require('@mapbox/polyline');
 const { metreToDeg, rectangleCorners, haversineDistance } = require('./geoUtils');
-const { snapToWalkingPath } = require('./googleRequest');
+const { snapToWalkingPath, getWalkingRoute } = require('./googleRequest');
 const { isOnLand } = require('./landChecks');
-const GOOGLE_KEY = process.env.GOOGLE_API_KEY;
+
 
 //Rectangle Loop
 async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
@@ -26,32 +24,21 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
     snappedCorners.push(snapped);
   }
 
-  const originStr = `${start.lat},${start.lng}`;
-  const destStr = `${end.lat},${end.lng}`;
-  const waypoints = snappedCorners.slice(1).map(c => `${c.lat},${c.lng}`).join('|');
+  const waypoints = snappedCorners.slice(1).map(c => ({ lat: c.lat, lng: c.lng }));
 
-  const url = 'https://maps.googleapis.com/maps/api/directions/json';
-  const resp = await axios.get(url, {
-    params: {
-      origin: originStr,
-      destination: destStr,
-      waypoints,
-      mode: 'walking',
-      key: GOOGLE_KEY,
-    }
-  });
+  const result = await getWalkingRoute(start, end, waypoints)
 
-  if (!resp.data.routes.length) {
-    throw new Error('No route from Google');
+  if (!result || result.error || !result.coords) {
+    throw new Error(`Google failed to return route: ${result?.error || 'unknown error'}`);
   }
 
-  const raw = resp.data.routes[0].overview_polyline.points;
-  const latlngs = polyline.decode(raw);
-  const coords = latlngs.map(([lat, lng]) => [lng, lat]);
-
-  const dist = resp.data.routes[0].legs.reduce((sum, leg) => sum + leg.distance.value, 0);
-
-  return { coords, dist };
+  // Reject routes with known warnings: prevent routes to restricted areas etc
+  const restrictedWarning = result.warnings.find(w => w.toLowerCase().includes('restricted'));
+  console.log("Restricted Warning: ", restrictedWarning)
+  if (restrictedWarning) {
+    throw new Error(`Route warning: ${restrictedWarning}`);
+  }
+  return { coords: result.coords, dist: result.dist };
 }
 
 async function snapRectangleLoop(start, totalM) {
