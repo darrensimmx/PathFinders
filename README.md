@@ -13,10 +13,10 @@ Current Progress:
    OR
    git pull
 2. **Install Dependencies**
-    cd client
-    npm install
-    cd ../BackEnd/server
-    npm install
+    - cd client
+    - npm install
+    - cd ../BackEnd/server
+    - npm install
 3. **Run the Project**
    In seperate terminals:
    - FrontEnd
@@ -26,6 +26,8 @@ Current Progress:
      - cd BackEnd/server
      - npm run dev
      - npm install node-fetch@2
+     - npm install @turf/turf
+
 
 
 
