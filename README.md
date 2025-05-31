@@ -13,6 +13,7 @@ Current Progress:
    OR
    git pull
 2. **Install Dependencies**
+    - npm install @mapbox/polyline
     - cd client
     - npm install
     - cd ../BackEnd/server
