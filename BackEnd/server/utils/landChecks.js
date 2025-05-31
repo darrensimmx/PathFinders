@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const landGeoJSON = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../utils/sgland.geojson'))
+  fs.readFileSync(path.join(__dirname, '../data/sgland.geojson'))
 );
 
 function isOnLand(lat, lng) {

@@ -3,6 +3,7 @@
 const { metreToDeg, rectangleCorners, haversineDistance } = require('./geoUtils');
 const { snapToWalkingPath, getWalkingRoute } = require('./googleRequest');
 const { isOnLand } = require('./landChecks');
+const { isRouteInRestrictedArea } = require('./restrictionChecks');
 
 
 //Rectangle Loop
@@ -17,31 +18,33 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
     const dist = haversineDistance(corner, snapped);
     if (dist > 200) throw new Error(`Snapped point too far (${dist.toFixed(0)}m)`);
 
+    // First safety check: if on land
     if (!isOnLand(snapped.lat, snapped.lng)) {
       throw new Error(`Snapped point (${snapped.lat}, ${snapped.lng}) not on land`);
     }
 
+    
     snappedCorners.push(snapped);
   }
-
+  
   const waypoints = snappedCorners.slice(1).map(c => ({ lat: c.lat, lng: c.lng }));
-
+  
   const result = await getWalkingRoute(start, end, waypoints)
-
+  
   if (!result || result.error || !result.coords) {
     throw new Error(`Google failed to return route: ${result?.error || 'unknown error'}`);
   }
 
-  // Reject routes with known warnings: prevent routes to restricted areas etc
-  const restrictedWarning = result.warnings.find(w => w.toLowerCase().includes('restricted'));
-  console.log("Restricted Warning: ", restrictedWarning)
-  if (restrictedWarning) {
-    throw new Error(`Route warning: ${restrictedWarning}`);
+  // Second safety check: not on any restricted areas
+  if (isRouteInRestrictedArea(result.coords)) {
+    throw new Error('Snapped point is in restricted area');
   }
+  
   return { coords: result.coords, dist: result.dist };
 }
 
 async function snapRectangleLoop(start, totalM) {
+  console.log("start: ", start)
   const h = ((Math.random() + 1) / 2) * (totalM / 4);
   const { dLat: dh, dLng: dw } = metreToDeg(h, start.lat);
 
@@ -51,7 +54,7 @@ async function snapRectangleLoop(start, totalM) {
     for (const signW of [-1, 1]) {
       try {
         const corners = rectangleCorners(start, dh, dw, signH, signW);
-        console.log(corners)
+        //console.log(corners)
         const { coords, dist } = await snapAndRouteRectangle(start, start, dh, dw, signH, signW);
 
         const error = Math.abs(dist - totalM);

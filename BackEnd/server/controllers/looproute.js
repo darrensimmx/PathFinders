@@ -7,9 +7,11 @@ const { snapRectangleLoop } = require('../utils/routeTools')
 
 
 async function generateLoopRoute(start, distance, options = {}) {
+  console.log('[Request Start Location]:', start);
+
   const totalM = distance * 1000;
 
-  const { route, corners } = await snapRectangleLoop(start, totalM);  // simplified!
+  const { route, corners } = await snapRectangleLoop(start, totalM);  
 
   const [A, B, C, D] = corners || [];
   return {

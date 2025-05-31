@@ -17,7 +17,7 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
     throw new Error('Google API failed to return a valid shortest route');
   }
 
-  const { dist: shortestDist, coords: shortestCoords, warnings } = shortest;
+  const { dist: shortestDist, coords: shortestCoords } = shortest;
 
   // Step 0.5: Compare and override if needed
   let warning = null;

@@ -2,21 +2,11 @@
 //Handles the actual response logic for each API call
 const express = require('express')
 const router = express.Router() //creates an instances of Router to be used in app.js
-//const getORSRoute = require('../utils/orsRequest');
-//const geocodeLocation = require('../utils/geocodeLocation');
 const generateLoopRoute = require('../controllers/looproute')
 const generateDirectRoute = require('../controllers/directRoute');
 
 router.post('/', async (req, res) => {
   const { start, end, distance, routeType } = req.body;
-
-  // Distance check : undo when done
-  // if (typeof distance !== 'number' || isNaN(distance) || distance <= 0) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: 'Please enter a valid positive number for distance.'
-  //   });
-//}
 
   try {
     const startCoords = start;
@@ -57,7 +47,7 @@ router.post('/', async (req, res) => {
     }
 
     res.json({ success: true, ...result });
-    console.log("ORS response received:", result); //debug
+    //console.log("ORS response received:", result); //debug
   } catch (err) {
     console.error('[Route Error]', err.response?.data || err.message);
     res.status(500).json({
