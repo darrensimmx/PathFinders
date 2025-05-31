@@ -17,6 +17,7 @@ Current Progress:
     - npm install
     - cd ../BackEnd/server
     - npm install
+    - npm install @turf/turf
 3. **Run the Project**
    In seperate terminals:
    - FrontEnd
@@ -26,7 +27,7 @@ Current Progress:
      - cd BackEnd/server
      - npm run dev
      - npm install node-fetch@2
-     - npm install @turf/turf
+     
 
 
 
