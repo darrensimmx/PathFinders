@@ -4,7 +4,8 @@
     "scripts": {
         "dev:backend": "npm --prefix BackEnd/server run dev",
         "dev:frontend": "npm --prefix client           run dev",
-        "start": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+        "start": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "setup": "npm install @mapbox/polyline @turf/turf && npm install --prefix client && npm install --prefix BackEnd/server && npm install --prefix BackEnd/server node-fetch@2"
     },
     "devDependencies": {
         "concurrently": "^7.6.0"
