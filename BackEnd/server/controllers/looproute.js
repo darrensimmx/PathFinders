@@ -14,11 +14,20 @@ async function generateLoopRoute(start, distance, options = {}) {
   const { route, corners } = await snapRectangleLoop(start, totalM);  
 
   const [A, B, C, D] = corners || [];
+  
+   // Defensive check
+  if ([A, B, C, D].some(c => !c || isNaN(c.lat) || isNaN(c.lng))) {
+    console.warn('[LoopRoute Error] Invalid snapped corner(s):', corners);
+    throw new Error('generateLoopRoute failed: Invalid corners returned from snapRectangleLoop');
+  }
+
   return {
     type: 'rect-loop',
     geojson: { type: 'LineString', coordinates: route.coords },
     distance: route.dist,
-    ...(options?.returnCorners && { corners: { A, B, C, D } })
+    ...(options?.returnCorners && { 
+      corners: { A, B, C, D } 
+    })
   };
 }
 

@@ -40,13 +40,15 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
     throw new Error('Snapped point is in restricted area');
   }
   
-  return { coords: result.coords, dist: result.dist };
+  return { coords: result.coords, dist: result.dist, snappedCorners };
 }
 
 async function snapRectangleLoop(start, totalM) {
   console.log("start: ", start)
   const h = ((Math.random() + 1) / 2) * (totalM / 4);
   const { dLat: dh, dLng: dw } = metreToDeg(h, start.lat);
+  //console.log('Converted metres to degrees:', { h, dh, dw }); //debug
+
 
   let best = { error: Infinity, route: null };
 
@@ -55,11 +57,11 @@ async function snapRectangleLoop(start, totalM) {
       try {
         const corners = rectangleCorners(start, dh, dw, signH, signW);
         //console.log(corners)
-        const { coords, dist } = await snapAndRouteRectangle(start, start, dh, dw, signH, signW);
+        const { coords, dist, snappedCorners } = await snapAndRouteRectangle(start, start, dh, dw, signH, signW);
 
         const error = Math.abs(dist - totalM);
         if (error < best.error) {
-          best = { error, route: { coords, dist }, corners };
+          best = { error, route: { coords, dist }, corners: snappedCorners };
         }
       } catch (e) {
         console.warn(`Orientation (${signH},${signW}) failed:`, e.message);
