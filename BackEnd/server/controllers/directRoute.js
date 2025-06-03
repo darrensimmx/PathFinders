@@ -53,11 +53,11 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
   if (!custom || custom.error || !custom.coords) {
     throw new Error('Failed to generate adjusted A → B → C → End route');
   }
-  
+
 
   //Step 6: Compare how close this route is to desired distance
   const percentError = Math.abs(custom.dist - baseM) / baseM;
-  
+
   if (percentError < best.error) {
     best = {
       error: percentError,
