@@ -2,9 +2,9 @@
 Generate suitable running routes based on user preferences, customized to individual users
 
 Current Progress:
-- BackEnd has the basic logic for frontend to use. 
-- Should have the process of taking in input, giving an output on terminal and handling errors
-- Further logic that depends on routing API will be added later
+- Integrated Frontend and Backend for Milestone 1
+- Routing logic for loop routes and Point-to-Point routes
+- Improved accuracy (prevention of non-walkable routes and restricted areas)
 
 ## 🔧 Getting Started (Local Setup)
 1. **Clone the repo**
@@ -13,21 +13,10 @@ Current Progress:
    OR
    git pull
 2. **Install Dependencies**
-    - npm install @mapbox/polyline
-    - cd client
-    - npm install
-    - cd ../BackEnd/server
-    - npm install
-    - npm install @turf/turf
+    - npm run setup
 3. **Run the Project**
-   In seperate terminals:
-   - FrontEnd
-     - cd client
-     - npm run dev
-   - BackEnd
-     - cd BackEnd/server
-     - npm run dev
-     - npm install node-fetch@2
+    - npm start 
+   
      
 
 
