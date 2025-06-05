@@ -20,10 +20,12 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
     }
 
     const dist = haversineDistance(corner, snapped);
-    if (dist > 200) {
+  /*  
+  if (dist > 200) {
       //error to show that the init corner is very off, to regenerate init corner
-      throw new Error(`Snapped point too far (${dist.toFixed(0)}m)`);
+  //    throw new Error(`Snapped point too far (${dist.toFixed(0)}m)`);
     } 
+    */
 
     // First safety check: if on land
     if (!isOnLand(snapped.lat, snapped.lng)) {
