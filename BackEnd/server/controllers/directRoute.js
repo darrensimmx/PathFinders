@@ -48,10 +48,10 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
   console.log("adjusted loop: ", adjustedLoop)
   const { A: A2, B: B2, C: C2 } = adjustedLoop.corners;
 
-  // Step 5: Build a custom direct route A → B → C → end
+  // Step 5: Build a custom direct route A - B - C - end
   const custom = await getWalkingRoute(A2, end, [B2, C2]);
   if (!custom || custom.error || !custom.coords) {
-    throw new Error('Failed to generate adjusted A → B → C → End route');
+    throw new Error('Failed to generate adjusted A - B - C - End route');
   }
 
 
