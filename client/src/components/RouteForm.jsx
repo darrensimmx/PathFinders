@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import FormInput from './FormInput'
 
 export default function RouteForm({ onGenerate }) {
   const [start, setStart] = useState('');
@@ -13,68 +14,63 @@ export default function RouteForm({ onGenerate }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-      <div>
-        <label htmlFor="start" className="block text-sm font-medium text-white">
-          Starting point
-        </label>
-        <input
-          id="start"
-          type="text"
-          value={start}
-          onChange={e => setStart(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 bg-gray-700 text-white"
-          placeholder="Enter address or postal code"
-          required
-        />
-      </div>
+      <FormInput
+        label="Starting Point"
+        id="start"
+        value={start}
+        onChange={e => setStart(e.target.value)}
+        placeholder="Enter address or postal code"
+      />
 
-      <div>
-        <label htmlFor="end" className="block text-sm font-medium text-white">
-          End Point
-        </label>
-        <input
-          id="end"
-          type="text"
-          value={end}
-          onChange={e => setEnd(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 bg-gray-700 text-white"
-          placeholder="Enter address or postal code"
-          disabled={routeType === 'loop'}        // disable when loop
-          required={routeType === 'direct'}      // required only when direct
-        />
-      </div>
+      <FormInput
+        label="End Point"
+        id="end"
+        value={end}
+        onChange={e => setEnd(e.target.value)}
+        placeholder="Enter address or postal code"
+        disabled={routeType == 'loop'}
+        required={routeType == 'direct'}
+      />
 
-      <div>
-        <label htmlFor="distance" className="block text-sm font-medium text-white">
-          Distance to run (km)
-        </label>
-        <input
-          id="distance"
-          type="number"
-          step="any"
-          value={distance}
-          onChange={e => setDistance(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 bg-gray-700 text-white"
-          placeholder="e.g. 5.2"
-          required
-        />
-      </div>
+      <FormInput
+        label="Distance to Run (km)"
+        id="distance"
+        type="number"
+        step="any" //check what this is for
+        value={distance}
+        onChange={e => setDistance(e.target.value)}
+        placeholder="e.g. 5.2"
+      />
 
       {/* Route Type Toggle */}
+      
       <div>
-        <label htmlFor="routeType" className="block text-sm font-medium text-white">
+        <label className="block text-sm font-medium text-white mb-1">
           Route type
         </label>
-        <select
-          id="routeType"
-          value={routeType}
-          onChange={e => setRouteType(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 bg-gray-700 text-white"
-        >
-          <option value="loop">Loop (start and end same)</option>
-          <option value="direct">Point-to-point (A to B)</option>
-        </select>
-      </div>
+        <div className="flex w-full rounded-md bg-gray-700 overflow-hidden text-white text-sm font-medium">
+          <button
+            type="button"
+            onClick={() => setRouteType('loop')}
+            className={`w-1/2 px-4 py-2 transition-colors duration-200 ${
+              routeType === 'loop' ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            Loop
+          </button>
+          <button
+            type="button"
+            onClick={() => setRouteType('direct')}
+            className={`w-1/2 px-4 py-2 transition-colors duration-200 ${
+              routeType === 'direct' ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            Point-to-point
+          </button>
+  </div>
+</div>
+
+      
 
       <button
         type="submit"
@@ -96,3 +92,18 @@ export default function RouteForm({ onGenerate }) {
     </form>
   );
 }
+
+/*
+<label htmlFor="start" className="block text-sm font-medium text-white">
+          Starting point
+        </label>
+        <input
+          id="start"
+          type="text"
+          value={start}
+          onChange={e => setStart(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 bg-gray-700 text-white"
+          placeholder="Enter address or postal code"
+          required
+        />
+*/

@@ -30,17 +30,17 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
     };
   }
 
-  // Step 1: Generate a loop route with corners to extract D → A
+  // Step 1: Generate a loop route with corners to extract D - A
   const loopData = await generateLoopRoute(start, targetKm, { returnCorners: true });
   const { A, B, C, D } = loopData.corners;
 
-  // Step 2: Measure distance from D → A (final leg of loop)
+  // Step 2: Measure distance from D - A (final leg of loop)
   const daSegment = await getWalkingRoute(D, A);
   if (!daSegment || daSegment.error || !daSegment.dist) {
-    throw new Error('Failed to calculate D → A distance');
+    throw new Error('Failed to calculate D - A distance');
   }
 
-  // Step 3: Compensate distance by adding D → A to target
+  // Step 3: Compensate distance by adding D - A to target
   const adjustedKm = targetKm + daSegment.dist / 1000;
 
   // Step 4: Regenerate the loop with the longer distance
