@@ -78,7 +78,7 @@ export default function App() {
 
       const { type, geojson, distance: actualDist, warning } = await res.json();
 
-      // Convert [lng, lat] → [lat, lng] for Leaflet
+      // Convert [lng, lat] to [lat, lng] for Leaflet
       const latLngs = geojson.coordinates.map(
         ([lng, lat]) => [lat, lng]
       );

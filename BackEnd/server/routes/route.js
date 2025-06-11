@@ -1,9 +1,45 @@
-//Backend/server/routes/route.js
-//Handles the actual response logic for each API call
-const express = require('express')
-const router = express.Router() //creates an instances of Router to be used in app.js
-const generateLoopRoute = require('../controllers/looproute')
+// Backend/server/routes/route.js
+
+// Handles route generation (loop or direct), 2 km sampling, and WeatherAPI warnings.
+
+const express = require('express');
+const router = express.Router();
+
+const generateLoopRoute   = require('../controllers/looproute');
 const generateDirectRoute = require('../controllers/directRoute');
+
+const {
+  sampleEvery2km,
+  getWeatherWarnings
+} = require('../utils/weatherCheck');
+
+/**
+ * Extracts “routeCoords” from the controller’s output.
+ * We know now that your controller returns:
+ *   {
+ *     type: "rect-loop",
+ *     geojson: {
+ *       type: "LineString",
+ *       coordinates: [ [lng, lat], [lng, lat], … ]
+ *     },
+ *     distance: …
+ *   }
+ *
+ * So we simply map each [lng, lat] to { lat, lng }.
+ */
+function extractRouteCoords(result) {
+  if (
+    result &&
+    result.geojson &&
+    Array.isArray(result.geojson.coordinates)
+  ) {
+    return result.geojson.coordinates.map(([lng, lat]) => ({
+      lat,
+      lng
+    }));
+  }
+  throw new Error('Could not extract route coordinates from controller result.');
+}
 
 router.post('/', async (req, res) => {
   const { start, end, distance, routeType } = req.body;
@@ -46,8 +82,63 @@ router.post('/', async (req, res) => {
       result = await generateDirectRoute(startCoords, endCoords, distNum);
     }
 
-    res.json({ success: true, ...result });
-    //console.log("ORS response received:", result); //debug
+    
+    // 3. DEBUG: Log raw result so you can see its fields if needed
+    console.log(
+      '>>>> RAW CONTROLLER RESULT:',
+      JSON.stringify(result, null, 2)
+    );
+    
+
+    // 4. Extract normalized routeCoords: [ { lat, lng }, … ]
+    let routeCoords;
+    try {
+      routeCoords = extractRouteCoords(result);
+    } catch (e) {
+      console.error(
+        '[Route Error] could not parse coordinates:',
+        e.message
+      );
+      console.error(
+        'Full controller result:',
+        JSON.stringify(result, null, 2)
+      );
+      return res.status(500).json({
+        success: false,
+        message: 'Route was generated but coordinates could not be parsed.'
+      });
+    }
+
+    if (!Array.isArray(routeCoords) || routeCoords.length < 2) {
+      return res.status(500).json({
+        success: false,
+        message: 'Route has too few coordinates to sample.'
+      });
+    }
+
+    // 5. Sample every 2 km
+    const sampledPoints = sampleEvery2km(routeCoords);
+
+    // 6. Fetch weather warnings for each sampled point
+    let weatherWarnings = [];
+    try {
+      weatherWarnings = await getWeatherWarnings(sampledPoints);
+    } catch (weatherErr) {
+      console.warn('Weather check failed:', weatherErr.message);
+      // We'll still return the route without warnings
+    }
+
+    // 7. Return full response:
+    //    • Spread `result` so frontend still sees `type`, `geojson`, `distance`, etc.
+    //    • Add `routeCoords`, `samplesEvery2km`, and `weatherWarnings`.
+    return res.json({
+      success: true,
+      ...result,
+      routeCoords,          // [ { lat, lng }, … ]
+      samplesEvery2km: sampledPoints,
+      weatherWarnings       // [ { lat, lng, badHours:[…] }, … ]
+    });
+    
   } catch (err) {
     console.error('[Route Error]', err.response?.data || err.message);
     res.status(500).json({

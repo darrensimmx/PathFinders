@@ -19,13 +19,7 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
       throw new Error(`Corner at (${corner.lat}, ${corner.lng}) not walkable`);
     }
 
-    const dist = haversineDistance(corner, snapped);
-  /*  
-  if (dist > 200) {
-      //error to show that the init corner is very off, to regenerate init corner
-  //    throw new Error(`Snapped point too far (${dist.toFixed(0)}m)`);
-    } 
-    */
+    const dist = haversineDistance(corner, snapped); 
 
     // First safety check: if on land
     if (!isOnLand(snapped.lat, snapped.lng)) {
@@ -52,7 +46,7 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
   
   return { coords: result.coords, dist: result.dist, snappedCorners };
 }
-
+ 
 async function snapRectangleLoop(start, totalM) {
   //console.log("start: ", start) //debug
   //random number btw 0.5 and 1, to get half height
