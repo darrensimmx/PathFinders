@@ -1,4 +1,9 @@
 //Tests for Login and Authentication Features
+import { render, screen, fireEvent } from '@testing-library/react';
+import LoginForm from '../../../client/src/components/LoginForm'
+
+// Note to self: describe is used with multiple it(..) to test a fn w multiple test cases
+// For just a specific standalone case, can use test(..) instead
 
 const login = require('../controllers/authController').login;
 const signUp = require('../controllers/authController').signUp;
@@ -97,14 +102,6 @@ describe('Signed up with mocked data', () => {
     expect(result.message).toBe('Missing credentials');
   })
 })
-
-
-
-// Password input is type "password" by default => Password censors by default, 
-
-// Toggle visibility button works for password
-
-// Remember me checkbox saves data to localStorage (for now)
 
 
 

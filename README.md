@@ -27,3 +27,9 @@ Testing:
 **Local Host**
 FrontEnd should run on localhost:5173 while BackEnd runs on localhost:4000 
 => we don't use same host as one port can only run one server (hence the use of cors to integrate the different hosts)
+
+
+- client side might need to npm install react-icons
+- client side might need to npm install cypress --save-dev
+
+
