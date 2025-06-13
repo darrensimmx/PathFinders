@@ -1,5 +1,4 @@
-// Backend/server/routes/route.js
-
+// For routeGeneration feature: handles "/" POST req
 // Handles route generation (loop or direct), 2 km sampling, and WeatherAPI warnings.
 
 const express = require('express');

@@ -1,4 +1,5 @@
 //Backend/server/controllers/loopRoute.js
+// Controller for routeGeneration feature generation
 
 require('dotenv').config();
 // might want to include more shapes for better distance accuracy

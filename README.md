@@ -17,7 +17,9 @@ Current Progress:
 3. **Run the Project**
     - npm start 
    
-     
+Testing:
+- npm install --save-dev jest supertest
+- ensure that in packagejson, under "scripts", there is "test": "jest". Else, add it in.
 
 
 

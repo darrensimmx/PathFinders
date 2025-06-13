@@ -1,3 +1,4 @@
+// routeGeneration Feature
 // Backend/server/utils/weatherCheck.js
 
 // Utilities for “every 2 km” sampling and WeatherAPI checks.
