@@ -1,7 +1,11 @@
 //Controller for Authentication feature: handles login & signups
 
-async function login({ email, password }) {
+async function login(req, res) {
   //TODO: replace mocked data with actual data
+  const {email, password} = req.body;
+  // console.log(email)
+  // console.log(password)
+
   const mockUser = {
     email: "abc@example.com",
     password: "password123"
@@ -9,18 +13,18 @@ async function login({ email, password }) {
 
   //all mock data to be changed to real data
   if (!email || !password) {
-    return { status: 'error', message: 'Missing credentials'}
+    return res.json({ status: 'error', message: 'Missing credentials'})
   }
 
   if (email !== mockUser.email) {
-    return { status: 'error', message: 'User not found'}
+    return res.json({ status: 'error', message: 'User not found'})
   }
 
   if (password !== mockUser.password) {
-    return { status: 'error', message: 'Incorrect Password'}
+    return res.json({ status: 'error', message: 'Incorrect Password'})
   }
 
-  return { status: 'success'}
+  return res.json({ status: 'success'})
 }
 
 async function signUp({ email, password}) {

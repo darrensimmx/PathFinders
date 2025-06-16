@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../src/LoginForm.css'
+//Link to backend
+import axios from 'axios'
 
 //icons for login
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -9,19 +11,30 @@ import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginForm = () =>  {
   //track the current states of email and pw
+  console.log("LoginForm Rendered")
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); //by default pw typed is censored
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //TODO: Replace below mock data with call to backend
-    if (email === 'abc@gmail.com' && password === 'password123') {
-      navigate('/route-generator');
-    } else {
-      alert('Invalid login credentials')
+    try {
+      const response =  await axios.post('http://localhost:4000/api/login', {
+        email,
+        password
+      });
+      console.log(response.data.status)
+      if (response.data.status === 'success') {
+        navigate('/route-generator');
+      } else {
+        alert(response.data.message); // show alert on frontpage
+      } 
+    }
+    catch (error) {
+      console.log(error)
+      alert('Server error')
     }
 
   }

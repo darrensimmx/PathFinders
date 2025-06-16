@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
 const routeRouter = require('./routes/route')
+const authRoutes = require('./routes/authRoutes')
 
 const ORS_KEY = process.env.ORS_API_KEY;
 if (!ORS_KEY) {
@@ -15,6 +16,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Route to login page
+app.use('/api', authRoutes);
+
 // Unified route handler (direct and loop)
 app.use('/api/route', routeRouter);
 
@@ -23,4 +27,4 @@ app.get('/api/health', (_req, res) => res.json({ status: 'OK' }));
 
 // Start server
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Server listening on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));

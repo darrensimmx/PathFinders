@@ -93,17 +93,3 @@ export default function RouteForm({ onGenerate }) {
   );
 }
 
-/*
-<label htmlFor="start" className="block text-sm font-medium text-white">
-          Starting point
-        </label>
-        <input
-          id="start"
-          type="text"
-          value={start}
-          onChange={e => setStart(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 bg-gray-700 text-white"
-          placeholder="Enter address or postal code"
-          required
-        />
-*/
