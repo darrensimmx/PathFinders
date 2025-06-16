@@ -3,6 +3,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
+const mongoose = require('mongoose')
 const routeRouter = require('./routes/route')
 const authRoutes = require('./routes/authRoutes')
 
@@ -15,6 +16,11 @@ if (!ORS_KEY) {
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+//Connect to mongoose 
+mongoose.connect(process.env.MONGO_URI)
+        .then(() => console.log("Connected to MongoDB"))
+        .catch(err => console.error("MongoDB Connection error: ", err))
 
 // Route to login page
 app.use('/api', authRoutes);

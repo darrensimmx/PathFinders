@@ -1,8 +1,47 @@
 //Controller for Authentication feature: handles login & signups
 
-async function login(req, res) {
+const User = require("../models/userModel");
+
+// Mocked fn with mock data
+async function signUp({email, password}) {
+  //mongoose data
+  if (!email || !password) {
+    return { status: 'error', message: 'Missing credentials'}
+  }
+
+  const existing = await User.findOne({email});
+  if (existing) {
+    return { status: 'error', message: 'Email already in use'};
+  }
+
+  const hash = await bcrypt.hash(password, 10) //use bcrypt to hash
+  const newUser = new User({email, password: hash});
+  await newUser.save(); // save to mongodb
+  return { status: 'success'}
+}
+
+async function login({ email, password}) {
+  //mongoose data
+  if (!email || !password) {
+    return { status: 'error', message: 'Missing credentials' };
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return { status: 'error', message: 'User not found' };
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return { status: 'error', message: 'Incorrect password' };
+  }
+
+  return { status: 'success' };
+}
+
+// Mocked fn with mock data
+async function loginMock({email, password}) {
   //TODO: replace mocked data with actual data
-  const {email, password} = req.body;
   // console.log(email)
   // console.log(password)
 
@@ -13,21 +52,21 @@ async function login(req, res) {
 
   //all mock data to be changed to real data
   if (!email || !password) {
-    return res.json({ status: 'error', message: 'Missing credentials'})
+    return { status: 'error', message: 'Missing credentials'}
   }
 
   if (email !== mockUser.email) {
-    return res.json({ status: 'error', message: 'User not found'})
+    return { status: 'error', message: 'User not found'}
   }
 
   if (password !== mockUser.password) {
-    return res.json({ status: 'error', message: 'Incorrect Password'})
+    return { status: 'error', message: 'Incorrect Password'}
   }
 
-  return res.json({ status: 'success'})
+  return { status: 'success'}
 }
 
-async function signUp({ email, password}) {
+async function signUpMock({ email, password}) {
   //TODO: replace mocked data with actual data
   const mockUser = {
     email: 'new@gmail.com',
@@ -55,4 +94,5 @@ async function signUp({ email, password}) {
   return { status: 'success' }
 }
 
-module.exports = { login, signUp }
+module.exports = { loginMock, signUpMock, 
+                    login, signUp }

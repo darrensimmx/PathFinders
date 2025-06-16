@@ -1,12 +1,10 @@
 //Tests for Login and Authentication Features
-import { render, screen, fireEvent } from '@testing-library/react';
-import LoginForm from '../../../client/src/components/LoginForm'
 
 // Note to self: describe is used with multiple it(..) to test a fn w multiple test cases
 // For just a specific standalone case, can use test(..) instead
 
-const login = require('../controllers/authController').login;
-const signUp = require('../controllers/authController').signUp;
+const loginMock = require('../controllers/authController').loginMock;
+const signUpMock = require('../controllers/authController').signUpMock;
 // Login/sign up feature
 /****************************************Unit Testing****************************************/
 
@@ -14,7 +12,7 @@ const signUp = require('../controllers/authController').signUp;
 describe('Login with mocked data', () => {
   //return success if email & pw match mocked data
   it('should return success if email and password match mock data', async () => {
-    const result = await login({
+    const result = await loginMock({
       email: 'abc@example.com',
       password: 'password123'
     });
@@ -24,7 +22,7 @@ describe('Login with mocked data', () => {
   
   //return error if user not found
   it('should return error if user not found', async () => {
-    const result = await login({
+    const result = await loginMock({
       email: 'notfound@example.com',
       password: 'password123'
     });
@@ -35,7 +33,7 @@ describe('Login with mocked data', () => {
   
   //return error if pw incorrect
   it('should return error if password is incorrect', async () => {
-    const result = await login({
+    const result = await loginMock({
       email: 'abc@example.com',
       password: 'wrongPassword'
     });
@@ -47,7 +45,7 @@ describe('Login with mocked data', () => {
 
   //return error if missing email or password
   it('should return error if email or password is missing', async () => {
-    const result = await login({
+    const result = await loginMock({
       email: '',
       password: ''
     });
@@ -61,7 +59,7 @@ describe('Login with mocked data', () => {
 describe('Signed up with mocked data', () => {
   // Sign up returns success if valid username and password
   it('should return success if valid username and password', async () => {
-    const result = await signUp({
+    const result = await signUpMock({
       email: 'new@gmail.com',
       password: 'new123'
     });
@@ -71,7 +69,7 @@ describe('Signed up with mocked data', () => {
   
   // Sign up fails if email already taken: return "email already in use"
   it('should return error if email already taken', async () => {
-    const result = await signUp({
+    const result = await signUpMock({
       email: 'abc@example.com', //same as login email
       password: 'new123'
     })
@@ -82,7 +80,7 @@ describe('Signed up with mocked data', () => {
   
   // Sign up fails if email not in valid format
   it('should return error if email format is invalid', async () => {
-    const result = await signUp({
+    const result = await signUpMock({
       email: 'Invalid-format',
       password: 'new123'
     })
@@ -93,7 +91,7 @@ describe('Signed up with mocked data', () => {
   
   // Sign up fail if either password or email missing 
   it('should return error if either password or email missing', async () => {
-    const result = await signUp({
+    const result = await signUpMock({
       email: '',
       password: ''
     })

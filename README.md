@@ -31,5 +31,5 @@ FrontEnd should run on localhost:5173 while BackEnd runs on localhost:4000
 
 - client side might need to npm install react-icons
 - client side might need to npm install cypress --save-dev
-
+- BackEnd.server might need to npm install mongoose
 
