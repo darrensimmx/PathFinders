@@ -2,6 +2,7 @@
 
 const User = require("../models/userModel");
 const bcrypt = require('bcrypt')
+const crypto = require('crypto');
 
 // Mocked fn with mock data
 async function signUp({email, password}) {
@@ -39,6 +40,34 @@ async function login({ email, password}) {
   }
 
   return { status: 'success' };
+}
+
+//Forget Password
+async function forgotPassword({ email }) {
+  if (!email) {
+    return { status: 'error', message: 'Email is required' };
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return { status: 'error', message: 'User not found' };
+  }
+
+  // Generate secure token & expiry
+  const token = crypto.randomBytes(32).toString('hex');
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 1000 * 60 * 15; // 15 mins
+
+  await user.save();
+
+  const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+  console.log(`Password reset link: ${resetLink}`);
+
+  return {
+    status: 'success',
+    message: 'Password reset link generated',
+    resetLink
+  };
 }
 
 // Mocked fn with mock data
@@ -97,4 +126,5 @@ async function signUpMock({ email, password}) {
 }
 
 module.exports = { loginMock, signUpMock, 
-                    login, signUp }
+                    login, signUp,
+                  forgotPassword }

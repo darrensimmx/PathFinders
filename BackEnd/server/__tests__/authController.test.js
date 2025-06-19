@@ -223,6 +223,50 @@ describe('Auth API Integration', () => {
     expect(res.body.message).toMatch(/incorrect/i);
   });
 
+  //Forget password token 
+  it('should generate reset token for forgot password', async () => {
+    await request(app)
+          .post('/api/signup')
+          .send({
+            email: 'reset@gmail.com',
+            password: 'password123'
+          })
+    //call forget password
+    const res = await request(app)
+                      .post('/api/forgot-password')
+                      .send({email: 'reset@gmail.com'})
+    
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('success');
+    expect(res.body.resetLink).toMatch(/reset-password\?token=/);
+
+    //Verify DB still exist
+    const user = await mongoose.connection.db.collection('users').findOne({email : 'reset@gmail.com'})
+    expect(user.resetPasswordToken).toBeTruthy();
+    expect(new Date(user.resetPasswordExpires).getTime()).toBeGreaterThan(Date.now());
+  })
+
+  // Forgot password shud fail if non existing email entered
+  it('should return error for forgot password with unknown email', async () => {
+    const res = await request(app)
+                      .post('/api/forgot-password')
+                      .send({ email: 'nonexisting@gmail.com'});
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body.status).toBe('error');
+    expect(res.body.message).toMatch(/not found/i);            
+  })
+
+  // Forgot password shud fail when missing email
+  it('should return error if forgot password email is missing', async () => {
+    const res = await request(app)
+                      .post('/api/forgot-password')
+                      .send({ }); // send nth in
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.status).toBe('error');
+    expect(res.body.message).toMatch(/email/i);     
+  })
 });
 
 
