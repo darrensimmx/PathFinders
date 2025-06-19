@@ -3,7 +3,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
-const mongoose = require('mongoose')
 const routeRouter = require('./routes/route')
 const authRoutes = require('./routes/authRoutes')
 
@@ -17,12 +16,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-//Connect to mongoose 
-mongoose.connect(process.env.MONGO_URI)
-        .then(() => console.log("Connected to MongoDB"))
-        .catch(err => console.error("MongoDB Connection error: ", err))
+// //Connect to mongoose 
+// mongoose.connect(process.env.MONGO_URI)
+//         .then(() => console.log("Connected to MongoDB"))
+//         .catch(err => console.error("MongoDB Connection error: ", err))
 
-// Route to login page
+// Route to login/signup page defined in authRoutes
 app.use('/api', authRoutes);
 
 // Unified route handler (direct and loop)
@@ -31,6 +30,8 @@ app.use('/api/route', routeRouter);
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'OK' }));
 
-// Start server
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
+// Start server => moved to Backend/server.js to deconflict
+// const PORT = process.env.PORT || 4000;
+// app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
+
+module.exports = app;

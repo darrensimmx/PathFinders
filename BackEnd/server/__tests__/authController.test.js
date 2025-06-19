@@ -1,10 +1,17 @@
 //Tests for Login and Authentication Features
 
+const { default: mongoose } = require('mongoose');
+const request = require('supertest') // for Mongoose testing
+const { MongoMemoryServer } = require('mongodb-memory-server')
+
 // Note to self: describe is used with multiple it(..) to test a fn w multiple test cases
 // For just a specific standalone case, can use test(..) instead
 
 const loginMock = require('../controllers/authController').loginMock;
 const signUpMock = require('../controllers/authController').signUpMock;
+const app = require('../app');
+//console.log('typeof app:', typeof app);
+
 // Login/sign up feature
 /****************************************Unit Testing****************************************/
 
@@ -108,13 +115,115 @@ describe('Signed up with mocked data', () => {
 
 
 /****************************************Integration Testing****************************************/
+let mongoServer;
 
-// Fill email, password and submit to see expected behavior
+beforeAll(async () => {
+  // spin up in-memory DB
+  mongoServer = await MongoMemoryServer.create()
+  const uri = mongoServer.getUri()
+  await mongoose.connect(uri)
+})
 
-// Invalid credentials will show error message
+afterAll(async () => {
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
 
-// Succesful login will trigger redirection to routeGeneration
+afterEach(async () => {
+  //clear users after each test to isolate
+  await mongoose.connection.db.collection('users').deleteMany({})
+})
 
+// Fill email, password and submit to see expected behavior in Mongoose
+describe('Auth API Integration', () => {
+
+  //email and password should store in db when entered correctly
+  it('should register a new user successfully', async () => {
+    const res = await request(app)
+      .post('/api/signup')
+      .send({
+        email: 'test@example.com',
+        password: 'password123'
+      });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('success');
+
+    // DB actually has user
+    const user = await mongoose.connection.db.collection('users').findOne({ email: 'test@example.com' });
+    expect(user).toBeTruthy();
+    expect(user.password).not.toBe('password123'); // Should be hashed
+  });
+
+  // invalid email should not be in db and throw error
+  it('should not register duplicate email', async () => {
+    // Register first
+    await request(app)
+      .post('/api/signup')
+      .send({
+        email: 'test@example.com',
+        password: 'password123'
+      });
+
+    // Try again
+    const res = await request(app)
+      .post('/api/signup')
+      .send({
+        email: 'test@example.com',
+        password: 'another123'
+      });
+
+    expect(res.statusCode).toBe(200); 
+    expect(res.body.status).toBe('error');
+    expect(res.body.message).toMatch(/already/i);
+  });
+
+  // login works with an actual data from db
+  it('should login with correct credentials', async () => {
+    // Register first
+    await request(app)
+      .post('/api/signup')
+      .send({
+        email: 'login@example.com',
+        password: 'password123'
+      });
+
+    // Then login
+    const res = await request(app)
+      .post('/api/login')
+      .send({
+        email: 'login@example.com',
+        password: 'password123'
+      });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('success');
+  });
+
+  // login should fail with wrong password
+  it('should fail login with wrong password', async () => {
+    // Register first
+    await request(app)
+      .post('/api/signup')
+      .send({
+        email: 'wrongpass@example.com',
+        password: 'correctpass'
+      });
+
+    // Try wrong password
+    const res = await request(app)
+      .post('/api/login')
+      .send({
+        email: 'wrongpass@example.com',
+        password: 'wrongpass'
+      });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('error');
+    expect(res.body.message).toMatch(/incorrect/i);
+  });
+
+});
 
 
 
@@ -128,17 +237,9 @@ describe('Signed up with mocked data', () => {
 // Authentication feature
 /****************************************Unit Testing****************************************/
 
-// User model throws on missing fields
-
-// User not found in database
-
 // Password is hashed
 
 // Same password, different hash using salt
-
-// bcrypt.compare() works to validate password
-
-// Invalid email format rejected (mongoose validator later, for now custom check)
 
 // JWT token is generated with correct payload (jwt.sign() output)
 

@@ -74,7 +74,7 @@ const LoginForm = () =>  {
           <button type="submit" className="bg-blue-600 text-white py-2 rounded">Login</button>
 
           <div className="register-link">
-            <p>Don't have an account? <a href="#">Register</a></p>
+            <p>Don't have an account? <a href="/register">Register</a></p>
           </div>
         </form>
       </div>

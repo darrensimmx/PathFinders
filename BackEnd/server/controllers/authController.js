@@ -1,6 +1,7 @@
 //Controller for Authentication feature: handles login & signups
 
 const User = require("../models/userModel");
+const bcrypt = require('bcrypt')
 
 // Mocked fn with mock data
 async function signUp({email, password}) {
@@ -14,8 +15,9 @@ async function signUp({email, password}) {
     return { status: 'error', message: 'Email already in use'};
   }
 
-  const hash = await bcrypt.hash(password, 10) //use bcrypt to hash
-  const newUser = new User({email, password: hash});
+  const salt = await bcrypt.genSalt() 
+  const hashedPassword = await bcrypt.hash(password, salt) //use bcrypt to hash
+  const newUser = new User({email, password: hashedPassword});
   await newUser.save(); // save to mongodb
   return { status: 'success'}
 }
