@@ -5,6 +5,8 @@ const express = require('express');
 const cors    = require('cors');
 const routeRouter = require('./routes/route')
 const authRoutes = require('./routes/authRoutes')
+const cookieParser = require('cookie-parser'); // jwt helper
+const protectedRoutes = require('./routes/protectedRoutes')
 
 const ORS_KEY = process.env.ORS_API_KEY;
 if (!ORS_KEY) {
@@ -15,6 +17,7 @@ if (!ORS_KEY) {
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser())
 
 // //Connect to mongoose 
 // mongoose.connect(process.env.MONGO_URI)
@@ -23,12 +26,14 @@ app.use(express.json());
 
 // Route to login/signup page defined in authRoutes
 app.use('/api', authRoutes);
+app.use('/api', protectedRoutes);
 
 // Unified route handler (direct and loop)
 app.use('/api/route', routeRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'OK' }));
+
 
 // Start server => moved to Backend/server.js to deconflict
 // const PORT = process.env.PORT || 4000;

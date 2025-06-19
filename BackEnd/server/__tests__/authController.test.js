@@ -218,7 +218,7 @@ describe('Auth API Integration', () => {
         password: 'wrongpass'
       });
 
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(401);
     expect(res.body.status).toBe('error');
     expect(res.body.message).toMatch(/incorrect/i);
   });
@@ -278,16 +278,126 @@ describe('Auth API Integration', () => {
 
 
 
-// Authentication feature
+// Remember Me function
 /****************************************Unit Testing****************************************/
 
-// Password is hashed
-
-// Same password, different hash using salt
-
-// JWT token is generated with correct payload (jwt.sign() output)
 
 
+describe('remember me flow', () => {
+  // issue refresh token cookie when checked
+  it('should issue refreshToken cookie when rememberMe is true', async () => {
+    await request(app)
+    .post('/api/signup')
+    .send({
+      email: 'rememberme@gmail.com',
+      password: 'password123'
+    })
+    
+    const res = await request(app)
+    .post('/api/login')
+    .send({
+      email: 'rememberme@gmail.com',
+      password: 'password123',
+      rememberMe: true
+    });
+    
+    expect(res.statusCode).toBe(200);
+    expect(res.body.accessToken).toBeTruthy();
+    
+    const cookies = res.headers['set-cookie'];
+    expect(cookies).toBeDefined();
+    expect(cookies.join(';')).toMatch(/refreshToken=/);
+  })
+  
+  // does not issue refresh token cookie when unchecked
+  
+  it('should NOT issue refreshToken cookie when rememberMe is false', async () => {
+    // Register another user
+    await request(app)
+    .post('/api/signup')
+    .send({
+      email: 'noremember@example.com',
+      password: 'password123'
+    });
+    
+    // Login without rememberMe
+    const res = await request(app)
+    .post('/api/login')
+    .send({
+      email: 'noremember@example.com',
+      password: 'password123',
+      rememberMe: false
+    });
+    
+    expect(res.statusCode).toBe(200);
+    expect(res.body.accessToken).toBeTruthy();
+    // Should NOT have a Set-Cookie header
+    const cookies = res.headers['set-cookie'];
+    expect(cookies).toBeUndefined();
+  });
+  
+  // should refresh token using refreshToken cookie
+  it('should refresh token using refreshToken cookie', async () => {
+    // Register & login with rememberMe
+    await request(app)
+      .post('/api/signup')
+      .send({
+        email: 'refresh@example.com',
+        password: 'password123'
+      });
+
+    const loginRes = await request(app)
+      .post('/api/login')
+      .send({
+        email: 'refresh@example.com',
+        password: 'password123',
+        rememberMe: true
+      });
+
+    const cookies = loginRes.headers['set-cookie'];
+
+    // Call refresh-token with cookie attached
+    const refreshRes = await request(app)
+      .post('/api/refresh-token')
+      .set('Cookie', cookies)
+      .send();
+
+    expect(refreshRes.statusCode).toBe(200);
+    expect(refreshRes.body.accessToken).toBeTruthy();
+  });
+})
+
+// Authentication feature
+test('should access protected route with valid accessToken', async () => {
+  // Ensure test@example.com exists
+  await request(app)
+    .post('/api/signup')
+    .send({
+      email: 'test@example.com',
+      password: 'password123'
+    });
+
+  // Login to get fresh token
+  const loginRes = await request(app)
+    .post('/api/login')
+    .send({
+      email: 'test@example.com',
+      password: 'password123',
+      rememberMe: true
+    });
+
+  const accessToken = loginRes.body.accessToken;
+  console.log('AccessToken:', accessToken);
+
+  const res = await request(app)
+    .get('/api/protected')
+    .set('Authorization', `Bearer ${accessToken}`);
+
+  console.log('Protected status:', res.statusCode, res.body);
+
+  expect(res.statusCode).toBe(200);
+  expect(res.body.message).toMatch(/protected/);
+});
 
 
 
@@ -295,13 +405,4 @@ describe('Auth API Integration', () => {
 
 
 
-/****************************************Integration Testing****************************************/
-
-// /signup creates a new user
-
-// /login returns token for valid credentials
-
-// incorrect password returns 401
-
-// token-based access to protected route
 

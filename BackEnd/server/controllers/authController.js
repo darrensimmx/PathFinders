@@ -3,8 +3,11 @@
 const User = require("../models/userModel");
 const bcrypt = require('bcrypt')
 const crypto = require('crypto');
+//const { UNSAFE_useRouteId } = require("react-router-dom");
+//for rememberme fn
+const jwt = require('jsonwebtoken');
+const { SECRET } = require('../config');
 
-// Mocked fn with mock data
 async function signUp({email, password}) {
   //mongoose data
   if (!email || !password) {
@@ -23,7 +26,7 @@ async function signUp({email, password}) {
   return { status: 'success'}
 }
 
-async function login({ email, password}) {
+async function login({ email, password, rememberMe}) {
   //mongoose data
   if (!email || !password) {
     return { status: 'error', message: 'Missing credentials' };
@@ -39,7 +42,16 @@ async function login({ email, password}) {
     return { status: 'error', message: 'Incorrect password' };
   }
 
-  return { status: 'success' };
+  //Issue short lived access token
+  const accessToken = jwt.sign({id: user._id}, SECRET, {expiresIn: '15m'});
+
+  let refreshToken = null;
+
+  if (rememberMe) {
+    refreshToken = jwt.sign({id: user._id}, SECRET, {expiresIn: '7d'});
+  }
+
+  return { status: 'success', accessToken, refreshToken };
 }
 
 //Forget Password
