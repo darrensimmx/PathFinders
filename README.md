@@ -36,4 +36,4 @@ FrontEnd should run on localhost:5173 while BackEnd runs on localhost:4000
 - Backend server might need npm install --save-dev mongodb-memory-server
 - Backend server might need npm install jsonwebtoken cookie-parser
 
-
+- Need to make sure IP Address is whitelisted to MongoDB
