@@ -128,8 +128,8 @@ router.post('/', async (req, res) => {
     }
 
     // 7. Return full response:
-    //    • Spread `result` so frontend still sees `type`, `geojson`, `distance`, etc.
-    //    • Add `routeCoords`, `samplesEvery2km`, and `weatherWarnings`.
+    //     Spread `result` so frontend still sees `type`, `geojson`, `distance`, etc.
+    //    Add `routeCoords`, `samplesEvery2km`, and `weatherWarnings`.
     return res.json({
       success: true,
       ...result,
