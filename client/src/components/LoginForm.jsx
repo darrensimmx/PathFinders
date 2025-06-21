@@ -68,7 +68,7 @@ const LoginForm = () =>  {
 
           <div className="remember-forgot">
             <label><input type="checkbox" />Remember me</label>
-            <a href="#">Forgot password?</a>
+            <a href="/forgot-password">Forgot password?</a>
           </div>
           
           <button type="submit" className="bg-blue-600 text-white py-2 rounded">Login</button>

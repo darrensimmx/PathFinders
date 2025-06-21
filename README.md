@@ -34,4 +34,6 @@ FrontEnd should run on localhost:5173 while BackEnd runs on localhost:4000
 - BackEnd.server might need to npm install mongoose
 - Backend server might need npm i bcrypt
 - Backend server might need npm install --save-dev mongodb-memory-server
+- Backend server might need npm install jsonwebtoken cookie-parser
+
 
