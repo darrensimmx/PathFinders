@@ -6,7 +6,12 @@ import '../../src/LoginForm.css'
 import axios from 'axios'
 
 //icons for login
-import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
+
+//reusable components
+import AuthWrapper from './Common/AuthWrapper';
+import InputBox from './Common/InputBox';
+import PasswordInput from './Common/PasswordInput';
 
 
 const LoginForm = () =>  {
@@ -14,7 +19,7 @@ const LoginForm = () =>  {
   console.log("LoginForm Rendered")
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); //by default pw typed is censored
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -43,32 +48,22 @@ const LoginForm = () =>  {
 
   }
   return (
-    <div className='login-form-container'>
-      <div className="wrapper">
-        <form onSubmit={handleSubmit}>
+    <AuthWrapper> 
+      <form onSubmit={handleSubmit}>
           <h1>PathFinder</h1>
           
-          <div className="input-box">
-            <input 
-              type="text" 
-              placeholder='Email' 
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}/>
-            <FaUser className='icon'/>
-          </div>
+          <InputBox 
+            type="text"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            icon={<FaUser />}
+          />
 
-          <div className="input-box">
-            <input 
-            type={showPassword ? 'text' : 'password'} // toggle logic
-            placeholder='Password' 
-            required
+          <PasswordInput 
             value={password}
-            onChange={(e) => setPassword(e.target.value)}/>
-            <span className="icon" onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>
-              {showPassword ? <FaEyeSlash /> : <FaEye/>}
-            </span>
-          </div>
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           <div className="remember-forgot">
             <label><input type="checkbox" />Remember me</label>
@@ -81,8 +76,7 @@ const LoginForm = () =>  {
             <p>Don't have an account? <a href="/register">Register</a></p>
           </div>
         </form>
-      </div>
-    </div>
+    </AuthWrapper>   
   )
 }
 
