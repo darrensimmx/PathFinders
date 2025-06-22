@@ -3,7 +3,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
-const routeRouter = require('./routes/route')
+const routeGeneratorRouter = require('./routes/routeGeneratorRoutes')
+const savedRoutes = require('./routes/savedRoutesRoutes')
 const authRoutes = require('./routes/authRoutes')
 const cookieParser = require('cookie-parser'); // jwt helper
 const protectedRoutes = require('./routes/protectedRoutes')
@@ -27,9 +28,10 @@ app.use(cookieParser())
 // Route to login/signup page defined in authRoutes
 app.use('/api', authRoutes);
 app.use('/api', protectedRoutes);
+app.use('/api', savedRoutes)
 
 // Unified route handler (direct and loop)
-app.use('/api/route', routeRouter);
+app.use('/api/route', routeGeneratorRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'OK' }));

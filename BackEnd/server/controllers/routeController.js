@@ -1,5 +1,5 @@
 // controllers/routeController.js
-
+// Controller for Route History Feature
 const User = require('../models/userModel');
 
 async function addSavedRoute(userId, routeData) {
@@ -21,14 +21,25 @@ async function fetchSavedRoutes(userId) {
   return user.savedRoutes;
 }
 
-async function removeSavedRoute(userId, routeName) {
+
+async function fetchSingleRoute(userId, routeId) {
+  const user = await User.findById(userId);
+  if (!user) throw new Error('User not found!');
+
+  const route = user.savedRoutes.id(routeId);
+  if (!route) throw new Error('Route not found!');
+
+  return route;
+}
+
+async function removeSavedRoute(userId, routeId) {
   const user = await User.findById(userId);
   
   if (!user) throw new Error('User Not Found!');
 
   const initialCount = user.savedRoutes.length;
 
-  user.savedRoutes = user.savedRoutes.filter(route => route.name !== routeName);
+  user.savedRoutes = user.savedRoutes.filter(route => route._id.toString() !== routeId.toString());
 
   if (user.savedRoutes.length === initialCount) {
     throw new Error('Route not found');
@@ -38,4 +49,4 @@ async function removeSavedRoute(userId, routeName) {
   return true;
 
 }
-module.exports = { addSavedRoute, fetchSavedRoutes, removeSavedRoute };
+module.exports = { addSavedRoute, fetchSavedRoutes, fetchSingleRoute, removeSavedRoute };
