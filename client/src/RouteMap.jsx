@@ -10,11 +10,14 @@ import {
   useMapEvents
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';  // ensure leaflet styles are applied
+import InvalidateMapSizeHandler from '../utils/useInvalidateMapSize';
 
-export default function RouteMap({ routeCoords }) {
+
+export default function RouteMap({ routeCoords, sidebarOpen }) {
   const center = routeCoords?.[0] || [1.3521, 103.8198];
   const [clickPos, setClickPos] = useState(null);
   const [clickInfo, setClickInfo] = useState(null);
+
 
   function ClickHandler() {
     useMapEvents({
@@ -37,19 +40,23 @@ export default function RouteMap({ routeCoords }) {
   }
 
   return (
-    <MapContainer
+    <div className="map">
+      <MapContainer
       center={center}
       zoom={13}
       scrollWheelZoom={true}
       style={{
-        position: 'absolute',
-        top: 0, bottom: 0, left: 0, right: 0
+        width: '100%',
+        height: '100%',
+        position: "relative"
       }}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; OpenStreetMap contributors"
       />
+
+      <InvalidateMapSizeHandler trigger={sidebarOpen}/>
 
       <ClickHandler />
 
@@ -70,6 +77,7 @@ export default function RouteMap({ routeCoords }) {
         </>
       )}
     </MapContainer>
+    </div>
   );
 }
 
