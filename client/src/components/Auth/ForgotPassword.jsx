@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../src/LoginForm.css'; // reuse same styling
+import '../../LoginForm.css'; // reuse same styling
 import axios from 'axios';
 import { FaUser } from "react-icons/fa";
 

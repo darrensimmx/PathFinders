@@ -1,10 +1,10 @@
 // Central base for all the pages
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LoginForm from './components/LoginForm'
-import RegisterForm from './components/RegisterForm'
-import RouteGenerator from './components/RouteGenerator';
-import ForgotPassword from './components/ForgotPassword';
+import LoginForm from './components/Auth/LoginForm'
+import RegisterForm from './components//Auth/RegisterForm'
+import ForgotPassword from './components/Auth/ForgotPassword';
+import RouteGenerator from './components/Route/RouteGenerator';
 
 function App() {
   return (

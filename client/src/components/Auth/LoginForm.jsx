@@ -1,7 +1,7 @@
 //Page for Login 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../src/LoginForm.css'
+import '../../LoginForm.css'
 //Link to backend
 import axios from 'axios'
 
@@ -9,9 +9,9 @@ import axios from 'axios'
 import { FaUser } from "react-icons/fa";
 
 //reusable components
-import AuthWrapper from './Common/AuthWrapper';
-import InputBox from './Common/InputBox';
-import PasswordInput from './Common/PasswordInput';
+import AuthWrapper from '../Common/AuthWrapper';
+import InputBox from '../Common/InputBox';
+import PasswordInput from '../Common/PasswordInput';
 
 
 const LoginForm = () =>  {

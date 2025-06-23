@@ -1,10 +1,10 @@
 //Page for RouteGenerator
 
 import React, { useState } from 'react';
-import { geocode } from '../../utils/geocode.js';
+import { geocode } from '../../../utils/geocode.js';
 import RouteForm from './RouteForm.jsx';
-import RouteMap from './RouteMap.jsx';
-import '../index.css';
+import RouteMap from '../../RouteMap.jsx';
+import '../../index.css';
 
 export default function RouteGenerator() {
   const [coords, setCoords]               = useState(null);

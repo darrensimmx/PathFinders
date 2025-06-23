@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FormInput from './FormInput'
+import FormInput from '../Auth/FormInput'
 
 export default function RouteForm({ onGenerate }) {
   const [start, setStart] = useState('');
