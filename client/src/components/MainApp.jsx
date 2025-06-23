@@ -91,7 +91,13 @@ export default function MainApp() {
           error={error}
           onSave={handleSaveRoute}
         />
-        <RouteMap sidebarOpen={isSidebarOpen}/>
+
+        <main className="map-wrapper">
+          <RouteMap 
+            sidebarOpen={isSidebarOpen}
+            routeCoords={coords} 
+          />
+        </main>
       </div>
     </>
   );
