@@ -51,7 +51,7 @@ const ForgotPassword = () => {
           {message && <p style={{ marginTop: '10px' }}>{message}</p>}
 
           <div className="register-link">
-            <p>Remember your password? <a href="/login">Back to Login</a></p>
+            <p>Remember your password? <a href="/">Back to Login</a></p>
           </div>
         </form>
       </div>

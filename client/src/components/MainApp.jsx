@@ -98,6 +98,8 @@ export default function MainApp() {
             routeCoords={coords} 
           />
         </main>
+
+        {/*<WeatherWarning/>*/}        
       </div>
     </>
   );

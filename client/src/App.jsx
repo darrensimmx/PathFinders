@@ -8,14 +8,12 @@ import MainApp from './components/MainApp'
 
 function App() {
   return (
-    <BrowserRouter>
       <Routes>
         <Route path="/route-generator" element={<MainApp />}/>
         <Route path="/" element={<LoginForm />}/>
         <Route path="/register" element={<RegisterForm />}/>
         <Route path="/forgot-password" element={<ForgotPassword />}/>
       </Routes>
-    </BrowserRouter>
   )
 }
 
