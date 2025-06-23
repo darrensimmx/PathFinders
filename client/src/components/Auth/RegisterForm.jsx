@@ -53,7 +53,7 @@ const RegisterForm = () => {
           <button type="submit" className="bg-blue-600 text-white py-2 rounded">Register</button>
 
           <div className="register-link">
-            <p>Already have an account? <a href="/login">Login</a></p>
+            <p>Already have an account? <a href="/">Login</a></p>
           </div>
         </form>
     </AuthWrapper>    
