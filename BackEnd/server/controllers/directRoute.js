@@ -26,7 +26,7 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
     return {
       type: 'shortest',
       geojson: { type: 'LineString', coordinates: shortestCoords },
-      distance: shortestDist,
+      actualDist: shortestDist,
       warning: `Minimum possible walking route is ${(shortestDist / 1000).toFixed(2)} km. Using closest available route instead.`
     };
   }
@@ -65,7 +65,7 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
       route: {
         type: 'custom-direct',
         geojson: { type: 'LineString', coordinates: custom.coords },
-        distance: custom.dist,
+        actualDist: custom.dist,
         corners: { A: A2, B: B2, C: C2, end }
       }
     };

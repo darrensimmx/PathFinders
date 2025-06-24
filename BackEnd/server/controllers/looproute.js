@@ -22,10 +22,16 @@ async function generateLoopRoute(start, distance, options = {}) {
     throw new Error('generateLoopRoute failed: Invalid corners returned from snapRectangleLoop');
   }
 
+  if (!route || !route.coords || !route.dist) {
+    console.warn('[LoopRoute Error] Invalid route output:', route);
+    throw new Error('generateLoopRoute failed: Invalid route returned from snapRectangleLoop');
+  }
+
+
   return {
     type: 'rect-loop',
     geojson: { type: 'LineString', coordinates: route.coords },
-    distance: route.dist,
+    actualDist: route.dist,
     ...(options?.returnCorners && { 
       corners: { A, B, C, D } 
     })

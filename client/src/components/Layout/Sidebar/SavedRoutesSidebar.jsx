@@ -1,16 +1,44 @@
-import BackBtn from '../../Assets/BackBtn.png'
+import React from 'react';
+import SavedRouteCard from './SavedRouteCard';
 import SidebarHeader from './SidebarHeader';
 
-export default function SavedRoutesSidebar({ setActiveView }) {
+function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, onSave, currentGeneratedRoute }) {
+
+  const handleClearAll = () => {
+  const confirmClear = window.confirm("Are you sure you want to clear all saved routes?");
+  if (confirmClear) {
+      onClearAll();
+    }
+  };
+
   return (
-    <div className="savedRoutes-sidebar">
-      
+    <aside className="sidebar">
       <SidebarHeader 
         subtitle="Saved Routes"
         onBack={() => setActiveView('navigation')}
       />
 
-      <p>TODO: fill with routes and backend logic</p>
-    </div>
+      <div className="routes-list">
+        {routes.length === 0 ? (
+          <p>No saved routes yet.</p>
+        ) : (
+          routes.slice(0, 5).map((route, idx) => (
+            <SavedRouteCard
+              key={idx}
+              route={route}
+              onDelete={() => onDeleteRoute(idx)}
+            />
+          ))
+        )}
+      </div>
+
+      {routes.length > 0 && (
+        <button className="clear-btn" onClick={handleClearAll}>
+          Clear All
+        </button>
+      )}
+    </aside>
   );
 }
+
+export default SavedRoutesSidebar;

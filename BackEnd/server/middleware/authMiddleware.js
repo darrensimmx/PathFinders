@@ -22,6 +22,9 @@ function authenticateToken(req, res, next) {
     }
     req.user = user; // Attach decoded payload to request
     next();
+    console.log("Decoded user in middleware:", user);
+    console.log("req.user in route:", req.user);
+    console.log("req.user.id in route:", req.user.id);
   });
 }
 

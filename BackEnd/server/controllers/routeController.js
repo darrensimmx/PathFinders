@@ -10,6 +10,11 @@ async function addSavedRoute(userId, routeData) {
     throw new Error('Limit of 5 saved routes for free plan');
   }
 
+  console.log("RouteData: ", routeData)
+  if (!routeData || typeof routeData !== 'object' || !routeData.name) {
+    throw new Error('Invalid route data: missing required fields.');
+  }
+
   user.savedRoutes.push(routeData);
   await user.save();
   return user.savedRoutes[user.savedRoutes.length - 1];

@@ -5,7 +5,7 @@ import FilterSelector from './FilterSelector';
 import { FaCommentDots } from 'react-icons/fa';
 import RouteMessagePanel from '../../Route/RouteMessagePanel';
 
-export default function RouteGeneratorSidebar({ handleGenerate, setActiveView, routeMessage, routeDistance, loading, error, onSave }) {
+export default function RouteGeneratorSidebar({ handleGenerate, setActiveView, routeMessage, routeDistance, loading, error, onSave, currentGeneratedRoute }) {
   const [filters, setFilters] = useState([]);
   const availableFilters = ['Elevation 15%', 'GBTB', 'No Traffic Light'];
 
@@ -16,8 +16,7 @@ export default function RouteGeneratorSidebar({ handleGenerate, setActiveView, r
   return (
     <div className="p-4 text-white flex flex-col h-full w-full">
       <SidebarHeader
-        title="Route Generator"
-        subtitle=""
+        subtitle="Route Generator"
         onBack={() => setActiveView('navigation')}
       />
 
@@ -33,7 +32,8 @@ export default function RouteGeneratorSidebar({ handleGenerate, setActiveView, r
         distance={routeDistance}
         loading={loading}
         error={error}
-        onSave={onSave}
+        onSave={() => onSave(currentGeneratedRoute)}
+        currentGeneratedRoute={currentGeneratedRoute}
       />
 
       <div className="mt-auto pt-4 border-t border-gray-600">

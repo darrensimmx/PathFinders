@@ -2,7 +2,7 @@
 import React from 'react';
 import { FaBookmark } from 'react-icons/fa'
 
-export default function RouteMessagePanel({ message, distance, loading, error, onSave }) {
+export default function RouteMessagePanel({ message, distance, loading, error, onSave, currentGeneratedRoute }) {
   return (
     <div className="mt-4 text-sm">
       {loading && (
@@ -13,7 +13,7 @@ export default function RouteMessagePanel({ message, distance, loading, error, o
         <p className="text-red-500">{error}</p>
       )}
 
-      {message && (
+      {message && currentGeneratedRoute && (
         <div className="bg-gray-800 text-white p-3 rounded space-y-2">
           <p>{message}</p>
           {distance && (
@@ -27,6 +27,7 @@ export default function RouteMessagePanel({ message, distance, loading, error, o
             className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
             <FaBookmark size={20}/>
+            {console.log("Saving: ", currentGeneratedRoute)}
           </button>
             <p>TODO: WIRE UP THIS BUTTON TO THE ACTUAL SAVING</p>
         </div>

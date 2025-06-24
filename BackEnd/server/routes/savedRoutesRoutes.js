@@ -8,6 +8,8 @@ router.post('/saved-routes/save', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const route = req.body.route;
+    console.log("Request UsedID: ", req.user.id)
+    console.log("Request route: ", req.body.route)
     await addSavedRoute(userId, route);
     res.json({message: 'Route saved successfully'})
   } catch (err) {
