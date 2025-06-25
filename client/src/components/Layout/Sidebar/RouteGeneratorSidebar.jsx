@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
-import SidebarHeader from './SidebarHeader';
-import RouteForm from '../../Route/RouteForm';
-import FilterSelector from './FilterSelector';
-import { FaCommentDots } from 'react-icons/fa';
-import RouteMessagePanel from '../../Route/RouteMessagePanel';
+// client/src/components/Layout/Sidebar/RouteGeneratorSidebar.jsx
 
-export default function RouteGeneratorSidebar({ handleGenerate, setActiveView, routeMessage, routeDistance, loading, error, onSave, currentGeneratedRoute }) {
+import React, { useState } from 'react';
+import SidebarHeader        from './SidebarHeader';
+import RouteForm            from '../../Route/RouteForm';
+import FilterSelector       from './FilterSelector';
+import WeatherWarningSidebar from './WeatherWarningSidebar';
+import RouteMessagePanel    from '../../Route/RouteMessagePanel';
+import { FaCommentDots }    from 'react-icons/fa';
+
+export default function RouteGeneratorSidebar({
+  handleGenerate,
+  setActiveView,
+  routeMessage,
+  routeDistance,
+  loading,
+  error,
+  onSave,
+  currentGeneratedRoute,
+  samplesEvery2km,
+  weatherWarnings
+}) {
   const [filters, setFilters] = useState([]);
   const availableFilters = ['Elevation 15%', 'GBTB', 'No Traffic Light'];
 
@@ -26,15 +40,26 @@ export default function RouteGeneratorSidebar({ handleGenerate, setActiveView, r
         selectedFilters={filters}
         setSelectedFilters={setFilters}
       />
-      
-      <RouteMessagePanel
-        message={routeMessage}
-        distance={routeDistance}
-        loading={loading}
-        error={error}
-        onSave={() => onSave(currentGeneratedRoute)}
-        currentGeneratedRoute={currentGeneratedRoute}
-      />
+
+      {/* Weather panel goes here */}
+      <div className="mt-4">
+        <WeatherWarningSidebar
+          samplesEvery2km={samplesEvery2km}
+          weatherWarnings={weatherWarnings}
+        />
+      </div>
+
+      {/* Feedback & save section */}
+      <div className="mt-6">
+        <RouteMessagePanel
+          message={routeMessage}
+          distance={routeDistance}
+          loading={loading}
+          error={error}
+          onSave={() => onSave(currentGeneratedRoute)}
+          currentGeneratedRoute={currentGeneratedRoute}
+        />
+      </div>
 
       <div className="mt-auto pt-4 border-t border-gray-600">
         <div className="flex items-center mb-1">
