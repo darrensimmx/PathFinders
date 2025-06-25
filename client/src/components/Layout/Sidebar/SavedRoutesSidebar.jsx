@@ -23,11 +23,14 @@ function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, 
           <p>No saved routes yet.</p>
         ) : (
           routes.slice(0, 5).map((route, idx) => (
+            <>
+            {console.log('Rendering route:', route)}
             <SavedRouteCard
               key={idx}
               route={route}
-              onDelete={() => onDeleteRoute(idx)}
+              onDelete={() => onDeleteRoute(route._id)}
             />
+            </>
           ))
         )}
       </div>

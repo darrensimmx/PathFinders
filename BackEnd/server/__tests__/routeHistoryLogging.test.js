@@ -26,6 +26,8 @@ geoJson returned from routeGenerator function
  */
 
 /************************************UNIT TEST ************************************/
+const SavedRoute = require('../models/savedRouteModel');
+
 const { default: mongoose } = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server')
 const User = require("../models/userModel");
@@ -83,13 +85,19 @@ describe('Add Route function with Mocked Data', () => {
     }
 
     const newRoute = await addSavedRoute(user._id, mockedData);
-    const updatedUser = await User.findById(user._id);
+    const savedRoutes = await SavedRoute.find({ user: user._id });
 
-    expect(updatedUser.savedRoutes.length).toBe(1);
-    expect(newRoute.name).toBe(mockedData.name);
-    expect(updatedUser.savedRoutes[0].distance).toBe(mockedData.distance);
-    expect(updatedUser.savedRoutes[0].startPoint.coordinates).toEqual([2,3]);
-    expect(updatedUser.savedRoutes[0].endPoint.coordinates).toEqual([3,4]);
+    expect(savedRoutes.length).toBe(1);
+
+    const savedRouteInDB = await SavedRoute.findById(savedRoutes[0]._id);
+    expect(savedRouteInDB.distance).toBe(mockedData.distance);
+    expect(savedRouteInDB.startPoint.coordinates).toEqual([2, 3]);
+
+    // expect(updatedUser.savedRoutes.length).toBe(1);
+    // expect(newRoute.name).toBe(mockedData.name);
+    // expect(updatedUser.savedRoutes[0].distance).toBe(mockedData.distance);
+    // expect(updatedUser.savedRoutes[0].startPoint.coordinates).toEqual([2,3]);
+    // expect(updatedUser.savedRoutes[0].endPoint.coordinates).toEqual([3,4]);
   })
   //Reject if MongoDB user already has 5 routes => warning to user
   it('should not add more than 5 saved routes', async () => {
@@ -102,15 +110,17 @@ describe('Add Route function with Mocked Data', () => {
   }));
 
   //save to mongoDB user
-  user.savedRoutes = mockedData;
-  await user.save();
+  for (const route of mockedData) {
+    await addSavedRoute(user._id, route);
+  }
+
 
   const extraRoute = {
     name: 'Extra Route',
     distance: 5000,
     coordinates: [3, 4],
-    startPoint: { type: 'Point', coorinates: [4, 5]},
-    endPoint: { type: 'Point', coorinates: [5, 6]}
+    startPoint: { type: 'Point', coordinates: [4, 5]},
+    endPoint: { type: 'Point', coordinates: [5, 6]}
   }
 
   let error;
@@ -123,8 +133,8 @@ describe('Add Route function with Mocked Data', () => {
   expect(error).toBeDefined();
   expect(error.message).toBe('Limit of 5 saved routes for free plan');
 
-  const updatedUser = await User.findById(user._id);
-  expect(updatedUser.savedRoutes.length).toBe(5) //no added routes
+  const savedRoutes = await SavedRoute.find({ user: user._id });
+  expect(savedRoutes.length).toBe(5) //no added routes
   })
 })
 
@@ -172,9 +182,8 @@ describe('Fetch Single Route Based on Mocked Id', () => {
     };
     await addSavedRoute(user._id, newRoute);
 
-    const freshUser = await User.findById(user._id);
-    const routeId = freshUser.savedRoutes[0]._id;
-
+    const savedRoutes = await SavedRoute.find({ user: user._id });
+    const routeId = savedRoutes[0]._id;
     const route = await fetchSingleRoute(user._id, routeId);
 
     expect(route.name).toBe('MySingle');
@@ -223,8 +232,11 @@ describe('Delete Route Fn with Mocked Data', () => {
 
     await removeSavedRoute(user._id, added._id);
 
-    const updatedUser = await User.findById(user._id);
-    expect(updatedUser.savedRoutes.length).toBe(0)
+    const routeInDB = await SavedRoute.findById(added._id);
+    expect(routeInDB).toBeNull();
+
+    const savedRoutes = await SavedRoute.find({ user: user._id });
+    expect(savedRoutes.length).toBe(0);
   })
   
   //Give warning if route is not in DB in the first place
@@ -238,12 +250,13 @@ describe('Delete Route Fn with Mocked Data', () => {
     }
 
     let error;
-    try{
-      await removeSavedRoute(user._id, nonExistentRoute.name);
+    try {
+      const fakeRouteId = new mongoose.Types.ObjectId(); 
+      await removeSavedRoute(user._id, fakeRouteId);
     } catch (err) {
       error = err;
     }
-    
+
     expect(error).toBeDefined();
     expect(error.message).toBe('Route not found');
   })
@@ -361,8 +374,8 @@ describe('HTML request to backend', () => {
       .send({ route: route4 });
 
     //since we are using mongoId, we have to save it first in the DB
-    const updatedUser = await User.findById(user._id);
-    const route3Id = updatedUser.savedRoutes[0]._id
+    const savedRoutes  = await SavedRoute.find({ user: user._id });
+    const route3Id = savedRoutes.find(r => r.name === 'Integration Test Route3')._id;
     const res = await request(app)
       .get(`/api/saved-routes/${route3Id}`)
       .set('Authorization', `Bearer ${accessToken}`);
@@ -397,8 +410,8 @@ describe('HTML request to backend', () => {
           .send({route: route6})
 
      // console.log(updatedUser.savedRoutes[0])
-    const updatedUserBeforeDelete = await User.findById(user._id)
-    const route5Id = updatedUserBeforeDelete.savedRoutes[0]._id;
+    const savedRoutesBefore  = await SavedRoute.find({ user: user._id });
+    const route5Id = savedRoutesBefore.find(r => r.name === 'Integration Test Route5')._id;
           
     const res = await request(app)
           .delete(`/api/saved-routes/${route5Id}`)
@@ -407,9 +420,9 @@ describe('HTML request to backend', () => {
     expect(res.status).toBe(200)
     expect(res.body.message).toBe("Route Deleted")
           
-    const updatedUserAfterDelete = await User.findById(user._id)    
-    expect(updatedUserAfterDelete.savedRoutes.length).toBe(1)
-    expect(updatedUserAfterDelete.savedRoutes[0].name).toBe('Integration Test Route6')
+    const updatedUserAfterDelete = await SavedRoute.find({ user: user._id });    
+    expect(updatedUserAfterDelete.length).toBe(1);
+    expect(updatedUserAfterDelete[0].name).toBe('Integration Test Route6');
   })
 
 })

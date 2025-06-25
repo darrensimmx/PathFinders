@@ -1,6 +1,7 @@
 // controllers/routeController.js
 // Controller for Route History Feature
 const User = require('../models/userModel');
+const SavedRoute = require('../models/savedRouteModel');
 
 async function addSavedRoute(userId, routeData) {
   const user = await User.findById(userId);
@@ -15,13 +16,18 @@ async function addSavedRoute(userId, routeData) {
     throw new Error('Invalid route data: missing required fields.');
   }
 
-  user.savedRoutes.push(routeData);
+  const savedRoute = await SavedRoute.create({
+    ...routeData,
+    user: userId
+  });
+
+  user.savedRoutes.push(savedRoute._id);
   await user.save();
   return user.savedRoutes[user.savedRoutes.length - 1];
 }
 
 async function fetchSavedRoutes(userId) {
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).populate('savedRoutes');
   if (!user) throw new Error('User Not Found!');
   return user.savedRoutes;
 }
@@ -31,26 +37,20 @@ async function fetchSingleRoute(userId, routeId) {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found!');
 
-  const route = user.savedRoutes.id(routeId);
+  const route = await SavedRoute.findOne({ _id: routeId, user: userId });
   if (!route) throw new Error('Route not found!');
 
   return route;
 }
 
 async function removeSavedRoute(userId, routeId) {
-  const user = await User.findById(userId);
-  
-  if (!user) throw new Error('User Not Found!');
+  const deleted = await SavedRoute.findOneAndDelete({ _id: routeId, user: userId });
+  if (!deleted) throw new Error('Route not found');
 
-  const initialCount = user.savedRoutes.length;
+  await User.findByIdAndUpdate(userId, {
+    $pull: { savedRoutes: routeId }
+  });
 
-  user.savedRoutes = user.savedRoutes.filter(route => route._id.toString() !== routeId.toString());
-
-  if (user.savedRoutes.length === initialCount) {
-    throw new Error('Route not found');
-  }
-
-  await user.save();
   return true;
 
 }

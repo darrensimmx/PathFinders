@@ -1,7 +1,6 @@
 // For database
 // defines MongoDB User schema 
 const mongoose = require('mongoose');
-const savedRouteSchema = require('./savedRouteModel');
 
 //TODO: update with more fields as we progress the features
 const userSchema = new mongoose.Schema({
@@ -17,10 +16,10 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordToken: String, 
   resetPasswordExpires: Date,
-  savedRoutes: {
-    type: [savedRouteSchema],
-    default: []
-  }
+  savedRoutes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'SavedRoute'
+  }]
 })
 
 const User = mongoose.model('User', userSchema);

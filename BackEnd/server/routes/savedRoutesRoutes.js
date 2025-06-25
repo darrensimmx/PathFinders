@@ -2,6 +2,28 @@ const express = require('express')
 const router = express.Router()
 const {addSavedRoute, fetchSavedRoutes, fetchSingleRoute, removeSavedRoute } = require('../controllers/routeController');
 const authenticateToken = require('../middleware/authMiddleware')
+const User = require('../models/userModel');
+const SavedRoute = require('../models/savedRouteModel'); 
+
+//delete all routes
+router.delete('/saved-routes/clear-all', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Delete the actual saved route documents
+    await SavedRoute.deleteMany({ _id: { $in: user.savedRoutes } });
+
+    // Clear user's reference array
+    user.savedRoutes = [];
+    await user.save();
+
+    return res.status(200).json({ message: 'All saved routes cleared' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Failed to clear saved routes', error: err.message });
+  }
+});
 
 // POST /api/routes/save
 router.post('/saved-routes/save', authenticateToken, async (req, res) => {
@@ -49,5 +71,7 @@ router.delete('/saved-routes/:routeId', authenticateToken, async (req, res) =>{
     res.status(400).json({message: err.message})
   }
 })
+
+
 
 module.exports = router;

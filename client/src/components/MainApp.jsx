@@ -90,7 +90,7 @@ export default function MainApp() {
 
   async function handleClearAllRoutes() {
   try {
-    const res = await fetch('/api/saved-routes', {
+    const res = await fetch('/api/saved-routes/clear-all', {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -176,7 +176,7 @@ export default function MainApp() {
         ? `Loop around ${startInput}`
         : `Route from ${startInput} to ${endInput}`,
         distance: Number(distKm),
-        coordinates: latLngs,
+        coordinates: geoJson.coordinates,
         startPoint: { type: 'Point', coordinates: [start.lng, start.lat]  },
         endPoint: {type: 'Point', coordinates: routeType === 'loop' 
                                                             ? [start.lng, start.lat]

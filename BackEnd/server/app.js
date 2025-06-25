@@ -26,7 +26,7 @@ app.use(cookieParser())
 //         .catch(err => console.error("MongoDB Connection error: ", err))
 
 // Route to login/signup page defined in authRoutes
-app.use('/api', authRoutes);
+app.use('/api/saved-routes', authRoutes);
 app.use('/api', protectedRoutes);
 app.use('/api', savedRoutes)
 
