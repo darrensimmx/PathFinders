@@ -2,7 +2,7 @@ import React from 'react';
 import SavedRouteCard from './SavedRouteCard';
 import SidebarHeader from './SidebarHeader';
 
-function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, onSave, currentGeneratedRoute }) {
+function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, onSave, currentGeneratedRoute, user }) {
 
   const handleClearAll = () => {
   const confirmClear = window.confirm("Are you sure you want to clear all saved routes?");
@@ -16,6 +16,7 @@ function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, 
       <SidebarHeader 
         subtitle="Saved Routes"
         onBack={() => setActiveView('navigation')}
+        user={user}
       />
 
       <div className="routes-list">
@@ -26,7 +27,7 @@ function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, 
             <>
             {console.log('Rendering route:', route)}
             <SavedRouteCard
-              key={idx}
+              key={route._id || idx}
               route={route}
               onDelete={() => onDeleteRoute(route._id)}
             />

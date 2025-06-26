@@ -22,6 +22,7 @@ export default function MainApp() {
   //Save route feature
   const [savedRoutes, setSavedRoutes] = useState([]) // default empty arr, to track saved routes
   const [currentGeneratedRoute, setCurrentGeneratedRoute] = useState(null); //To save current route
+  const [user, setUser] = useState(null)
   const accessToken = localStorage.getItem('accessToken');
 
   //connect to mongodb
@@ -43,6 +44,24 @@ export default function MainApp() {
     }
 
     fetchSavedRoutes();
+  }, []);
+
+  // for user profile
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/me', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        console.error('Failed to fetch user:', err);
+      }
+    };
+
+    if (accessToken) fetchUser();
   }, []);
 
   async function handleSaveRoute(route) {
@@ -211,6 +230,7 @@ export default function MainApp() {
           onDeleteRoute={handleDeleteRoute}
           onClearAll={handleClearAllRoutes}
           currentGeneratedRoute={currentGeneratedRoute}
+          user={user}
         />
 
         <main className="map-wrapper">

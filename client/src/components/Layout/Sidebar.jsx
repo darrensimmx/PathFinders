@@ -5,17 +5,18 @@ import RouteGeneratorSidebar from './Sidebar/RouteGeneratorSidebar'
 import ContactUsSidebar from './Sidebar/ContactUsSidebar'
 
 //TODO: Use React Context to prevent Prop Drilling
-function Sidebar({ isOpen, activeView, setActiveView, handleGenerate, routeMessage, routeDistance, loading, error, handleSaveRoute, routes, onClearAll, onDeleteRoute, currentGeneratedRoute }) {
+function Sidebar({ isOpen, activeView, setActiveView, handleGenerate, routeMessage, routeDistance, loading, error, handleSaveRoute, routes, onClearAll, onDeleteRoute, currentGeneratedRoute, user }) {
   return (
     <aside className={`sidebar ${isOpen ? '' : 'closed'}`}>
-      {activeView === 'navigation' && <NavigationSidebar setActiveView={setActiveView} />}
-      {activeView === 'profile' && <ProfileSidebar setActiveView={setActiveView} />}
+      {activeView === 'navigation' && <NavigationSidebar setActiveView={setActiveView} user={user}/>}
+      {activeView === 'profile' && <ProfileSidebar setActiveView={setActiveView} user={user} />}
       {activeView === 'savedRoutes' && <SavedRoutesSidebar setActiveView={setActiveView}
         onClearAll={onClearAll}
         routes={routes}
         onDeleteRoute={onDeleteRoute}
         onSave={() => handleSaveRoute(currentGeneratedRoute)}
         currentGeneratedRoute={currentGeneratedRoute}
+        user={user}
       />}
 
 
@@ -28,6 +29,7 @@ function Sidebar({ isOpen, activeView, setActiveView, handleGenerate, routeMessa
         error={error}
         onSave={() => handleSaveRoute(currentGeneratedRoute)}
         currentGeneratedRoute={currentGeneratedRoute}
+        user={user}
       />}
       {activeView === 'contact' && <ContactUsSidebar setActiveView={setActiveView} />}
     </aside>
