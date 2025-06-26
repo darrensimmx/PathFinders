@@ -147,6 +147,15 @@ button:hover {
   color: #c0b9dd;
 }
 
+.routes-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center children horizontally */
+  gap: 16px; /* Space between each SavedRouteCard */
+  padding: 1rem 0; /* Top and bottom spacing */
+}
+
+
 
 @media (max-width: 768px) {
   .leaflet-control-zoom {

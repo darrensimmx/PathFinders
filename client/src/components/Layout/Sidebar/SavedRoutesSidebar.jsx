@@ -1,8 +1,9 @@
 import React from 'react';
 import SavedRouteCard from './SavedRouteCard';
 import SidebarHeader from './SidebarHeader';
+import MiniMap from '../../Route/MiniMap';
 
-function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, onSave, currentGeneratedRoute, user }) {
+function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, onSave, currentGeneratedRoute, user, onSelectRoute }) {
 
   const handleClearAll = () => {
   const confirmClear = window.confirm("Are you sure you want to clear all saved routes?");
@@ -12,26 +13,25 @@ function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, 
   };
 
   return (
-    <aside className="sidebar">
+    <div className='saved-routes-content'>
       <SidebarHeader 
         subtitle="Saved Routes"
         onBack={() => setActiveView('navigation')}
         user={user}
       />
+      <h4>Saved Routes (Up to 5!)</h4>
 
       <div className="routes-list">
         {routes.length === 0 ? (
           <p>No saved routes yet.</p>
         ) : (
           routes.slice(0, 5).map((route, idx) => (
-            <>
-            {console.log('Rendering route:', route)}
             <SavedRouteCard
               key={route._id || idx}
               route={route}
               onDelete={() => onDeleteRoute(route._id)}
+              onClick={() => onSelectRoute(route)} // <- PASS CLICK EVENT
             />
-            </>
           ))
         )}
       </div>
@@ -41,7 +41,7 @@ function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, 
           Clear All
         </button>
       )}
-    </aside>
+    </div>
   );
 }
 

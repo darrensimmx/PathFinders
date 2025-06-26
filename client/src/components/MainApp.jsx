@@ -63,6 +63,7 @@ export default function MainApp() {
 
     if (accessToken) fetchUser();
   }, []);
+  
 
   async function handleSaveRoute(route) {
     try {
@@ -124,6 +125,17 @@ export default function MainApp() {
     console.error('Failed to clear all routes:', err);
     }
   }
+
+  //To select route to display back onto map
+  function handleSelectRoute(route) {
+    if (!route || !route.coordinates) return;
+
+    const latLngs = route.coordinates.map(([lng, lat]) => [lat, lng]);
+    setCoords(latLngs);  // Display on main map
+    setRouteMessage(`Showing saved route: ${route.name}`);
+    setRouteDistance(route.distance);
+  }
+
 
   
    async function handleGenerate({ start: startInput, end: endInput, distance, routeType }, filters) {
@@ -231,6 +243,7 @@ export default function MainApp() {
           onClearAll={handleClearAllRoutes}
           currentGeneratedRoute={currentGeneratedRoute}
           user={user}
+          onSelectRoute={handleSelectRoute}
         />
 
         <main className="map-wrapper">

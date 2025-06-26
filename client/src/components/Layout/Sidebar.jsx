@@ -5,7 +5,7 @@ import RouteGeneratorSidebar from './Sidebar/RouteGeneratorSidebar'
 import ContactUsSidebar from './Sidebar/ContactUsSidebar'
 
 //TODO: Use React Context to prevent Prop Drilling
-function Sidebar({ isOpen, activeView, setActiveView, handleGenerate, routeMessage, routeDistance, loading, error, handleSaveRoute, routes, onClearAll, onDeleteRoute, currentGeneratedRoute, user }) {
+function Sidebar({ isOpen, activeView, setActiveView, handleGenerate, routeMessage, routeDistance, loading, error, handleSaveRoute, routes, onClearAll, onDeleteRoute, onSelectRoute, currentGeneratedRoute, user }) {
   return (
     <aside className={`sidebar ${isOpen ? '' : 'closed'}`}>
       {activeView === 'navigation' && <NavigationSidebar setActiveView={setActiveView} user={user}/>}
@@ -17,6 +17,7 @@ function Sidebar({ isOpen, activeView, setActiveView, handleGenerate, routeMessa
         onSave={() => handleSaveRoute(currentGeneratedRoute)}
         currentGeneratedRoute={currentGeneratedRoute}
         user={user}
+        onSelectRoute={onSelectRoute}
       />}
 
 

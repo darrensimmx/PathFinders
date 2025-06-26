@@ -57,7 +57,7 @@ export default function FilterSelector({
         onClick={toggleOpen}
         className="
           w-full px-4 py-2
-          bg-purple-700 text-white font-semibold
+          bg-[#302b63] text-white font-semibold
           rounded flex justify-between items-center
         "
       >
@@ -99,7 +99,7 @@ export default function FilterSelector({
           <button
             type="button"
             onClick={handleApply}
-            className="w-full py-2 bg-purple-700 text-white font-semibold rounded"
+            className="w-full py-2 bg-[#302b63] text-white font-semibold rounded"
           >
             Apply Filters
           </button>
