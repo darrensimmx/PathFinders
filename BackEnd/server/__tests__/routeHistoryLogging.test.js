@@ -31,7 +31,7 @@ const SavedRoute = require('../models/savedRouteModel');
 const { default: mongoose } = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server')
 const User = require("../models/userModel");
-const {addSavedRoute, fetchSavedRoutes, fetchSingleRoute, removeSavedRoute } = require('../controllers/routeController');
+const { addSavedRoute, fetchSavedRoutes, fetchSingleRoute, removeSavedRoute } = require('../controllers/routeController');
 const { route } = require('../app');
 
 /**********Mocked Data **********/
@@ -58,6 +58,7 @@ let user;
 
 beforeEach(async () => {
   user = new User({
+    name: 'TestUser',
     email: 'abc@gmail.com',
     password: 'hashedPW',
     savedRoutes: []
@@ -76,7 +77,7 @@ describe('Add Route function with Mocked Data', () => {
       coordinates: [1, 2],
       startPoint: {
         type: 'Point',
-        coordinates: [2,3]
+        coordinates: [2, 3]
       },
       endPoint: {
         type: 'Point',
@@ -102,39 +103,39 @@ describe('Add Route function with Mocked Data', () => {
   //Reject if MongoDB user already has 5 routes => warning to user
   it('should not add more than 5 saved routes', async () => {
     const mockedData = Array.from({ length: 5 }).map((_, i) => ({
-    name: `Route ${i + 1}`,
-    distance: 5000,
-    coordinates: [1, 2],
-    startPoint: { type: 'Point', coordinates: [2, 3] },
-    endPoint: { type: 'Point', coordinates: [3, 4] }
-  }));
+      name: `Route ${i + 1}`,
+      distance: 5000,
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [2, 3] },
+      endPoint: { type: 'Point', coordinates: [3, 4] }
+    }));
 
-  //save to mongoDB user
-  for (const route of mockedData) {
-    await addSavedRoute(user._id, route);
-  }
+    //save to mongoDB user
+    for (const route of mockedData) {
+      await addSavedRoute(user._id, route);
+    }
 
 
-  const extraRoute = {
-    name: 'Extra Route',
-    distance: 5000,
-    coordinates: [3, 4],
-    startPoint: { type: 'Point', coordinates: [4, 5]},
-    endPoint: { type: 'Point', coordinates: [5, 6]}
-  }
+    const extraRoute = {
+      name: 'Extra Route',
+      distance: 5000,
+      coordinates: [3, 4],
+      startPoint: { type: 'Point', coordinates: [4, 5] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
+    }
 
-  let error;
-  try {
-    await addSavedRoute(user._id, extraRoute);
-  } catch (err) {
-    error = err;
-  }
+    let error;
+    try {
+      await addSavedRoute(user._id, extraRoute);
+    } catch (err) {
+      error = err;
+    }
 
-  expect(error).toBeDefined();
-  expect(error.message).toBe('Limit of 5 saved routes for free plan');
+    expect(error).toBeDefined();
+    expect(error.message).toBe('Limit of 5 saved routes for free plan');
 
-  const savedRoutes = await SavedRoute.find({ user: user._id });
-  expect(savedRoutes.length).toBe(5) //no added routes
+    const savedRoutes = await SavedRoute.find({ user: user._id });
+    expect(savedRoutes.length).toBe(5) //no added routes
   })
 })
 
@@ -145,16 +146,16 @@ describe('Fetch Route Fn with Mocked Data', () => {
       name: 'Route1',
       distance: 1000,
       coordinates: [1, 2],
-      startPoint: { type: 'Point', coordinates: [3, 4]},
-      endPoint: { type: 'Point', coordinates: [4, 5]}
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [4, 5] }
     }
 
     const route2 = {
       name: 'Route2',
       distance: 2000,
       coordinates: [1, 2],
-      startPoint: { type: 'Point', coordinates: [3, 4]},
-      endPoint: { type: 'Point', coordinates: [4, 5]}
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [4, 5] }
     }
 
     await addSavedRoute(user._id, route1);
@@ -223,8 +224,8 @@ describe('Delete Route Fn with Mocked Data', () => {
       name: 'Route3',
       distance: 3000,
       coordinates: [1, 2],
-      startPoint: { type: 'Point', coordinates: [3, 4]},
-      endPoint: { type: 'Point', coordinates: [4, 5]}
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [4, 5] }
     }
 
 
@@ -238,20 +239,20 @@ describe('Delete Route Fn with Mocked Data', () => {
     const savedRoutes = await SavedRoute.find({ user: user._id });
     expect(savedRoutes.length).toBe(0);
   })
-  
+
   //Give warning if route is not in DB in the first place
   it('should handle removing a non-existing route gracefully', async () => {
     const nonExistentRoute = {
       name: 'NonExistentRoute',
       distance: 3000,
       coordinates: [1, 2],
-      startPoint: { type: 'Point', coordinates: [3, 4]},
-      endPoint: { type: 'Point', coordinates: [4, 5]}
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [4, 5] }
     }
 
     let error;
     try {
-      const fakeRouteId = new mongoose.Types.ObjectId(); 
+      const fakeRouteId = new mongoose.Types.ObjectId();
       await removeSavedRoute(user._id, fakeRouteId);
     } catch (err) {
       error = err;
@@ -274,6 +275,7 @@ const { SECRET } = require('../config');
 let accessToken;
 beforeEach(async () => {
   user = new User({
+    name: 'IntegrationTestUser',
     email: 'test@example.com',
     password: 'hashedPassword',
     savedRoutes: []
@@ -291,15 +293,15 @@ describe('HTML request to backend', () => {
     const newRoute = {
       name: 'Integration Test Route',
       distance: 1000,
-      coordinates: [1,2],
-      startPoint: {type: 'Point', coordinates: [3, 4]},
-      endPoint: {type: 'Point', coordinates: [5, 6]}
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
     }
 
     const res = await request(app)
-                .post('/api/saved-routes/save')
-                .set('Authorization', `Bearer ${accessToken}`)
-                .send({route: newRoute})
+      .post('/api/saved-routes/save')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ route: newRoute })
 
     expect(res.status).toBe(200);
     expect(res.body.message).toBe('Route saved successfully')
@@ -310,19 +312,19 @@ describe('HTML request to backend', () => {
     const route1 = {
       name: 'Integration Test Route1',
       distance: 1000,
-      coordinates: [1,2],
-      startPoint: {type: 'Point', coordinates: [3, 4]},
-      endPoint: {type: 'Point', coordinates: [5, 6]}
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
     }
     const route2 = {
       name: 'Integration Test Route2',
       distance: 1000,
-      coordinates: [1,2],
-      startPoint: {type: 'Point', coordinates: [3, 4]},
-      endPoint: {type: 'Point', coordinates: [5, 6]}
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
     }
 
-    
+
     await request(app)
       .post('/api/saved-routes/save')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -336,12 +338,12 @@ describe('HTML request to backend', () => {
     const res = await request(app)
       .get('/api/saved-routes')
       .set('Authorization', `Bearer ${accessToken}`);
-    
+
     expect(res.status).toBe(200)
     expect(res.body.routes).toBeDefined();
     expect(Array.isArray(res.body.routes)).toBe(true);
 
-    expect(res.body.routes.length).toBe(2); 
+    expect(res.body.routes.length).toBe(2);
     expect(res.body.routes[0].name).toBe('Integration Test Route1')
     expect(res.body.routes[1].name).toBe('Integration Test Route2')
   })
@@ -351,16 +353,16 @@ describe('HTML request to backend', () => {
     const route3 = {
       name: 'Integration Test Route3',
       distance: 1000,
-      coordinates: [1,2],
-      startPoint: {type: 'Point', coordinates: [3, 4]},
-      endPoint: {type: 'Point', coordinates: [5, 6]}
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
     }
     const route4 = {
       name: 'Integration Test Route4',
       distance: 1000,
-      coordinates: [1,2],
-      startPoint: {type: 'Point', coordinates: [3, 4]},
-      endPoint: {type: 'Point', coordinates: [5, 6]}
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
     }
 
     await request(app)
@@ -374,53 +376,53 @@ describe('HTML request to backend', () => {
       .send({ route: route4 });
 
     //since we are using mongoId, we have to save it first in the DB
-    const savedRoutes  = await SavedRoute.find({ user: user._id });
+    const savedRoutes = await SavedRoute.find({ user: user._id });
     const route3Id = savedRoutes.find(r => r.name === 'Integration Test Route3')._id;
     const res = await request(app)
       .get(`/api/saved-routes/${route3Id}`)
       .set('Authorization', `Bearer ${accessToken}`);
 
-      expect(res.status).toBe(200)
-      expect(res.body.name).toBe('Integration Test Route3')
+    expect(res.status).toBe(200)
+    expect(res.body.name).toBe('Integration Test Route3')
   })
 
   // /api/route/:routeId => delete path
   it('should delete the route selected', async () => {
-      const route5 = {
+    const route5 = {
       name: 'Integration Test Route5',
       distance: 1000,
-      coordinates: [1,2],
-      startPoint: {type: 'Point', coordinates: [3, 4]},
-      endPoint: {type: 'Point', coordinates: [5, 6]}
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
     }
     const route6 = {
       name: 'Integration Test Route6',
       distance: 1000,
-      coordinates: [1,2],
-      startPoint: {type: 'Point', coordinates: [3, 4]},
-      endPoint: {type: 'Point', coordinates: [5, 6]}
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
     }
     await request(app)
-          .post('/api/saved-routes/save')
-          .set('Authorization', `Bearer ${accessToken}`)
-          .send({route: route5})
+      .post('/api/saved-routes/save')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ route: route5 })
     await request(app)
-          .post('/api/saved-routes/save')
-          .set('Authorization', `Bearer ${accessToken}`)
-          .send({route: route6})
+      .post('/api/saved-routes/save')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ route: route6 })
 
-     // console.log(updatedUser.savedRoutes[0])
-    const savedRoutesBefore  = await SavedRoute.find({ user: user._id });
+    // console.log(updatedUser.savedRoutes[0])
+    const savedRoutesBefore = await SavedRoute.find({ user: user._id });
     const route5Id = savedRoutesBefore.find(r => r.name === 'Integration Test Route5')._id;
-          
+
     const res = await request(app)
-          .delete(`/api/saved-routes/${route5Id}`)
-          .set('Authorization', `Bearer ${accessToken}`)
-    
+      .delete(`/api/saved-routes/${route5Id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+
     expect(res.status).toBe(200)
     expect(res.body.message).toBe("Route Deleted")
-          
-    const updatedUserAfterDelete = await SavedRoute.find({ user: user._id });    
+
+    const updatedUserAfterDelete = await SavedRoute.find({ user: user._id });
     expect(updatedUserAfterDelete.length).toBe(1);
     expect(updatedUserAfterDelete[0].name).toBe('Integration Test Route6');
   })
