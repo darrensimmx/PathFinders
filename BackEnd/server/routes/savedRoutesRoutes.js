@@ -6,7 +6,7 @@ const User = require('../models/userModel');
 const SavedRoute = require('../models/savedRouteModel'); 
 
 //delete all routes
-router.delete('/saved-routes/clear-all', authenticateToken, async (req, res) => {
+router.delete('/clear-all', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -26,7 +26,7 @@ router.delete('/saved-routes/clear-all', authenticateToken, async (req, res) => 
 });
 
 // POST /api/routes/save
-router.post('/saved-routes/save', authenticateToken, async (req, res) => {
+router.post('/save', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const route = req.body.route;
@@ -41,7 +41,7 @@ router.post('/saved-routes/save', authenticateToken, async (req, res) => {
 
 /**NOTE: Since GET is not as secure as POST, we pass in auth token instead of user ID ******/
 // GET /api/routes?userId=..
-router.get('/saved-routes', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try{
     const routes = await fetchSavedRoutes(req.user.id);
     res.json({routes})
@@ -51,7 +51,7 @@ router.get('/saved-routes', authenticateToken, async (req, res) => {
 })
 
 // GET /api/routes?:routeId?userId=..
-router.get('/saved-routes/:routeId', authenticateToken, async (req, res) => {
+router.get('/:routeId', authenticateToken, async (req, res) => {
   try{
     const route = await fetchSingleRoute(req.user.id, req.params.routeId);
     res.json(route);
@@ -61,7 +61,7 @@ router.get('/saved-routes/:routeId', authenticateToken, async (req, res) => {
 })
 
 // DELETE /api/route/delete
-router.delete('/saved-routes/:routeId', authenticateToken, async (req, res) =>{
+router.delete('/:routeId', authenticateToken, async (req, res) =>{
   try {
     const userId = req.user.id;
     const routeId = req.params.routeId;

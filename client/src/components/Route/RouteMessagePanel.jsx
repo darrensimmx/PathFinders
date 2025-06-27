@@ -29,7 +29,6 @@ export default function RouteMessagePanel({ message, distance, loading, error, o
             <FaBookmark size={20}/>
             {console.log("Saving: ", currentGeneratedRoute)}
           </button>
-            <p>TODO: WIRE UP THIS BUTTON TO THE ACTUAL SAVING</p>
         </div>
       )}
     </div>

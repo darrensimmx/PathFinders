@@ -8,9 +8,9 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { SECRET } = require('../config');
 
-async function signUp({email, password}) {
+async function signUp({name, email, password}) {
   //mongoose data
-  if (!email || !password) {
+  if (!name || !email || !password) {
     return { status: 'error', message: 'Missing credentials'}
   }
 
@@ -21,7 +21,7 @@ async function signUp({email, password}) {
 
   const salt = await bcrypt.genSalt() 
   const hashedPassword = await bcrypt.hash(password, salt) //use bcrypt to hash
-  const newUser = new User({email, password: hashedPassword});
+  const newUser = new User({name, email, password: hashedPassword});
   await newUser.save(); // save to mongodb
   return { status: 'success'}
 }

@@ -2,11 +2,12 @@ import SidebarHeader from "./SidebarHeader";
 import SidebarItem from "./SidebarItem";
 import { FaUser, FaSave, FaPlayCircle, FaComments } from 'react-icons/fa'
 
-export default function NavigationSidebar({ setActiveView }) {
+export default function NavigationSidebar({ setActiveView, user }) {
   return (
     <div>
       <SidebarHeader 
         subtitle="Menu"
+        user={user}
         // onBack={() => setActiveView('routeGenerator')}
       />
 

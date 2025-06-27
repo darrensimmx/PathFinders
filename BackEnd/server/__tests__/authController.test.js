@@ -142,6 +142,7 @@ describe('Auth API Integration', () => {
     const res = await request(app)
       .post('/api/signup')
       .send({
+        name: 'Test User',
         email: 'test@example.com',
         password: 'password123'
       });
@@ -161,6 +162,7 @@ describe('Auth API Integration', () => {
     await request(app)
       .post('/api/signup')
       .send({
+        name: 'Test User',
         email: 'test@example.com',
         password: 'password123'
       });
@@ -169,6 +171,7 @@ describe('Auth API Integration', () => {
     const res = await request(app)
       .post('/api/signup')
       .send({
+        name: 'Test User',
         email: 'test@example.com',
         password: 'another123'
       });
@@ -184,6 +187,7 @@ describe('Auth API Integration', () => {
     await request(app)
       .post('/api/signup')
       .send({
+        name: 'Test User',
         email: 'login@example.com',
         password: 'password123'
       });
@@ -192,6 +196,7 @@ describe('Auth API Integration', () => {
     const res = await request(app)
       .post('/api/login')
       .send({
+        name: 'Test User',
         email: 'login@example.com',
         password: 'password123'
       });
@@ -206,6 +211,7 @@ describe('Auth API Integration', () => {
     await request(app)
       .post('/api/signup')
       .send({
+        name: 'Test User',
         email: 'wrongpass@example.com',
         password: 'correctpass'
       });
@@ -214,6 +220,7 @@ describe('Auth API Integration', () => {
     const res = await request(app)
       .post('/api/login')
       .send({
+        name: 'Test User',
         email: 'wrongpass@example.com',
         password: 'wrongpass'
       });
@@ -228,6 +235,7 @@ describe('Auth API Integration', () => {
     await request(app)
           .post('/api/signup')
           .send({
+            name: 'Test User',
             email: 'reset@gmail.com',
             password: 'password123'
           })
@@ -289,6 +297,7 @@ describe('remember me flow', () => {
     await request(app)
     .post('/api/signup')
     .send({
+      name: 'Test User',
       email: 'rememberme@gmail.com',
       password: 'password123'
     })
@@ -296,6 +305,7 @@ describe('remember me flow', () => {
     const res = await request(app)
     .post('/api/login')
     .send({
+      name: 'Test User',
       email: 'rememberme@gmail.com',
       password: 'password123',
       rememberMe: true
@@ -316,6 +326,7 @@ describe('remember me flow', () => {
     await request(app)
     .post('/api/signup')
     .send({
+      name: 'Test User',
       email: 'noremember@example.com',
       password: 'password123'
     });
@@ -342,6 +353,7 @@ describe('remember me flow', () => {
     await request(app)
       .post('/api/signup')
       .send({
+        name: 'Test User',
         email: 'refresh@example.com',
         password: 'password123'
       });
@@ -349,6 +361,7 @@ describe('remember me flow', () => {
     const loginRes = await request(app)
       .post('/api/login')
       .send({
+        name: 'Test User',
         email: 'refresh@example.com',
         password: 'password123',
         rememberMe: true
@@ -373,6 +386,7 @@ test('should access protected route with valid accessToken', async () => {
   await request(app)
     .post('/api/signup')
     .send({
+      name: 'Test User',
       email: 'test@example.com',
       password: 'password123'
     });
@@ -381,6 +395,7 @@ test('should access protected route with valid accessToken', async () => {
   const loginRes = await request(app)
     .post('/api/login')
     .send({
+      name: 'Test User',
       email: 'test@example.com',
       password: 'password123',
       rememberMe: true

@@ -1,12 +1,12 @@
 // client/src/components/Layout/Sidebar.jsx
 
-import React from 'react';
-import NavigationSidebar     from './Sidebar/NavigationSidebar';
-import ProfileSidebar        from './Sidebar/ProfileSidebar';
-import SavedRoutesSidebar    from './Sidebar/SavedRoutesSidebar';
+import NavigationSidebar from './Sidebar/NavigationSidebar';
+import ProfileSidebar from './Sidebar/ProfileSidebar';
+import SavedRoutesSidebar from './Sidebar/SavedRoutesSidebar';
 import RouteGeneratorSidebar from './Sidebar/RouteGeneratorSidebar';
-import ContactUsSidebar      from './Sidebar/ContactUsSidebar';
+import ContactUsSidebar from './Sidebar/ContactUsSidebar';
 
+// TODO: Use React Context to prevent Prop Drilling
 function Sidebar({
   isOpen,
   activeView,
@@ -20,14 +20,22 @@ function Sidebar({
   routes,
   onClearAll,
   onDeleteRoute,
+  onSelectRoute,
   currentGeneratedRoute,
+  user,
   samplesEvery2km,
   weatherWarnings
 }) {
   return (
     <aside className={`sidebar ${isOpen ? '' : 'closed'}`}>
-      {activeView === 'navigation' && <NavigationSidebar setActiveView={setActiveView} />}
-      {activeView === 'profile'    && <ProfileSidebar setActiveView={setActiveView} />}
+      {activeView === 'navigation' && (
+        <NavigationSidebar setActiveView={setActiveView} user={user} />
+      )}
+
+      {activeView === 'profile' && (
+        <ProfileSidebar setActiveView={setActiveView} user={user} />
+      )}
+
       {activeView === 'savedRoutes' && (
         <SavedRoutesSidebar
           setActiveView={setActiveView}
@@ -36,6 +44,8 @@ function Sidebar({
           onDeleteRoute={onDeleteRoute}
           onSave={() => handleSaveRoute(currentGeneratedRoute)}
           currentGeneratedRoute={currentGeneratedRoute}
+          user={user}
+          onSelectRoute={onSelectRoute}
         />
       )}
 
@@ -47,14 +57,16 @@ function Sidebar({
           routeDistance={routeDistance}
           loading={loading}
           error={error}
-          onSave={() => handleSaveRoute(currentGeneratedRoute)}
+          onSave={handleSaveRoute}
           currentGeneratedRoute={currentGeneratedRoute}
-          samplesEvery2km={samplesEvery2km}        // pass in samples
-          weatherWarnings={weatherWarnings}        // pass in warnings
+          samplesEvery2km={samplesEvery2km}
+          weatherWarnings={weatherWarnings}
         />
       )}
 
-      {activeView === 'contact' && <ContactUsSidebar setActiveView={setActiveView} />}
+      {activeView === 'contact' && (
+        <ContactUsSidebar setActiveView={setActiveView} />
+      )}
     </aside>
   );
 }

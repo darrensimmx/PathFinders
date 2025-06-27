@@ -1,0 +1,80 @@
+.saved-route-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 auto; /* Center the card */
+  margin-top: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  width: calc(100% - 32px); /* Sidebar width minus padding */
+  max-width: 360px; /* Prevents it from being too wide on desktop */
+}
+
+.route-card {
+  background-color: #302b63;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px auto; /* Adds vertical spacing between cards and centers */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+
+.route-card:hover {
+  transform: translateY(-2px);
+}
+
+.route-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.route-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #888;
+}
+
+.delete-btn:hover {
+  color: #d9534f;
+}
+
+.route-card-body {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.route-card-body .mini-map {
+  width: 110px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.route-info {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.4;
+}
+
+.route-info p {
+  margin: 2px 0;
+}

@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import '../../LoginForm.css';
 import axios from 'axios';
 import { FaUser } from "react-icons/fa";
+import { RiMailAddFill } from "react-icons/ri";
 import InputBox from '../Common/InputBox';
 import PasswordInput from '../Common/PasswordInput';
 import AuthWrapper from '../Common/AuthWrapper';
 
 const RegisterForm = () => {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const RegisterForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:4000/api/signup', {
+        name, 
         email,
         password
       });
@@ -36,13 +39,20 @@ const RegisterForm = () => {
     <AuthWrapper>
       <form onSubmit={handleSubmit}>
           <h1>PathFinder</h1>
-          
+          <InputBox
+            type="text"
+            placeholder="Username"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            icon={<FaUser />}
+          />
+
           <InputBox
             type="text"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            icon={<FaUser />}
+            icon={<RiMailAddFill />}
           />
 
            <PasswordInput

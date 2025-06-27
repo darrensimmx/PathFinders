@@ -1,12 +1,12 @@
 // client/src/components/Layout/Sidebar/RouteGeneratorSidebar.jsx
 
 import React, { useState } from 'react';
-import SidebarHeader        from './SidebarHeader';
-import RouteForm            from '../../Route/RouteForm';
-import FilterSelector       from './FilterSelector';
+import SidebarHeader from './SidebarHeader';
+import RouteForm from '../../Route/RouteForm';
+import FilterSelector from './FilterSelector';
 import WeatherWarningSidebar from './WeatherWarningSidebar';
-import RouteMessagePanel    from '../../Route/RouteMessagePanel';
-import { FaCommentDots }    from 'react-icons/fa';
+import RouteMessagePanel from '../../Route/RouteMessagePanel';
+import { FaCommentDots } from 'react-icons/fa';
 
 export default function RouteGeneratorSidebar({
   handleGenerate,
@@ -18,7 +18,8 @@ export default function RouteGeneratorSidebar({
   onSave,
   currentGeneratedRoute,
   samplesEvery2km,
-  weatherWarnings
+  weatherWarnings,
+  user
 }) {
   const [filters, setFilters] = useState([]);
   const availableFilters = ['Elevation 15%', 'GBTB', 'No Traffic Light'];
@@ -32,16 +33,17 @@ export default function RouteGeneratorSidebar({
       <SidebarHeader
         subtitle="Route Generator"
         onBack={() => setActiveView('navigation')}
+        user={user}
       />
 
       <RouteForm onGenerate={onFormSubmit} />
+
       <FilterSelector
         availableFilters={availableFilters}
         selectedFilters={filters}
         setSelectedFilters={setFilters}
       />
 
-      {/* Weather panel goes here */}
       <div className="mt-4">
         <WeatherWarningSidebar
           samplesEvery2km={samplesEvery2km}
@@ -49,7 +51,6 @@ export default function RouteGeneratorSidebar({
         />
       </div>
 
-      {/* Feedback & save section */}
       <div className="mt-6">
         <RouteMessagePanel
           message={routeMessage}

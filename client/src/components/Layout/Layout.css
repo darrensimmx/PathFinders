@@ -1,19 +1,24 @@
 html, body, #root {
   height: 100%;
   margin: 0;
+  background-color: #0f0c29; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
+  overflow: hidden;
 }
 
 .header {
   position: fixed;
   top: 0; left: 0; width: 100%;
   height: 60px;
-  background: #9E74CF;
-  color: white;
+  background: #302b63;
+  color: #ffffff;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
 }
 
 .header .logo img {
@@ -24,17 +29,22 @@ html, body, #root {
   background: none;
   border: none;
   cursor: pointer;
+  color: #fff;
+  font-weight: bold;
 }
 
 .sidebar {
   width: 300px;
-  background: #F2EEFC;
-  color: white;
+  background: #1e1a3a;
+  color: #ffffff;
   padding: 20px;
   height: 100%;
   transition: width 0.3s ease, padding 0.3s ease;
   /* default: static for desktop, so map gets pushed */
   position: static;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 
@@ -42,6 +52,19 @@ html, body, #root {
   width: 0;
   padding: 0; 
   overflow: hidden; /* ensure content doesn't overflow */
+}
+
+.sidebar a,
+.sidebar p,
+.sidebar strong {
+  color: #c0b9dd;
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.sidebar a:hover {
+  color: #ff6ec7;
 }
 
 .app-container {
@@ -52,6 +75,87 @@ html, body, #root {
   width: 100%;
   overflow: hidden;
 }
+
+
+.map {
+  flex: 1;
+  height: 100%;
+  position: relative;
+}
+
+.map > .leaflet-container {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+button {
+  background-color: #7b2cbf;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #5e4b8b ;
+  box-shadow: 0 0 8px #ff6ec7;
+}
+
+.card {
+  background: #241b4c;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 15px rgba(255,110,199,0.1);
+}
+
+.nav-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  color: #c0b9dd;
+  transition: color 0.2s ease;
+}
+
+.nav-item:hover {
+  color: #ff6ec7;
+}
+
+.nav-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 3px; /* slight offset to align with text block */
+}
+
+.nav-text strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+  color: #ffffff;
+}
+
+.nav-text p {
+  font-size: 13px;
+  margin: 0;
+  color: #c0b9dd;
+}
+
+.routes-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center children horizontally */
+  gap: 16px; /* Space between each SavedRouteCard */
+  padding: 1rem 0; /* Top and bottom spacing */
+}
+
+
 
 @media (max-width: 768px) {
   .leaflet-control-zoom {
@@ -74,16 +178,4 @@ html, body, #root {
     width: 100%;  /* keep width so transform works */
     padding: 20px;  /* keep padding on mobile for content */
   }
-}
-
-.map {
-  flex: 1;
-  height: 100%;
-  position: relative;
-}
-
-.map > .leaflet-container {
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
 }
