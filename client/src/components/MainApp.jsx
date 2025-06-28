@@ -6,6 +6,7 @@ import Sidebar from './Layout/Sidebar';
 import RouteMap from '../RouteMap';
 import './Layout/Layout.css';
 import { geocode } from '../../utils/geocode';
+import WeatherAlertPopup from './WeatherAlertPopUp';
 
 export default function MainApp() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -23,6 +24,12 @@ export default function MainApp() {
   const [currentGeneratedRoute, setCurrentGeneratedRoute] = useState(null);
   const [user, setUser] = useState(null);
   const accessToken = localStorage.getItem('accessToken');
+
+  // Weather feature
+  const [weatherWarnings, setWeatherWarnings] = useState([]);
+  const [samplesEvery2km, setSamplesEvery2km] = useState([]);
+  const isDev = process.env.NODE_ENV === 'development'; // just to show the weather warning for dev mode
+
 
   // Fetch saved routes
   useEffect(() => {
@@ -78,9 +85,11 @@ export default function MainApp() {
 
       if (!res.ok) throw new Error(await res.text());
       console.log('Route saved successfully');
+      const saved = await res.json();
 
-      const newRoute = { ...route, createdAt: new Date() };
+      const newRoute = { ...route, _id: saved._id, createdAt: new Date() };
       setSavedRoutes((prev) => [...prev, newRoute]);
+      console.log("Attempting to save route:", route);
     } catch (err) {
       console.error('Failed to save route:', err);
     }
@@ -157,7 +166,9 @@ export default function MainApp() {
         throw new Error('Server returned invalid route coordinates.');
       }
 
-      const { type, warning, actualDist } = apiResponse;
+      const { type, warning, actualDist, weatherWarnings: ww, samplesEvery2km: s2k } = apiResponse;
+      setWeatherWarnings(ww || []);
+      setSamplesEvery2km(s2k || []);
 
       const latLngs = geoJson.coordinates.map(([lng, lat]) => [lat, lng]);
       setCoords(latLngs);
@@ -210,6 +221,27 @@ export default function MainApp() {
     setRouteDistance(route.distance);
   }
 
+  const mockWeatherWarnings = [
+    {
+      lat: 1.3,
+      lng: 103.8,
+      badHours: [
+        {time: '2.00 PM', condition: 'Thunderstorm'},
+        {time: '4.00 PM', condition: 'Heavy Rain'}
+      ]
+    }
+  ]
+
+  const mockSamples = [
+    {lat: 1.3, lng: 103.8},
+    {lat: 1.35, lng: 103.82}
+  ]
+
+  useEffect(() => {
+    setRouteMessage("Bad weather detected along your route: possible thunderstorm.");
+  }, []);
+
+
   return (
     <>
       <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -234,6 +266,33 @@ export default function MainApp() {
 
         <main className="map-wrapper">
           <RouteMap sidebarOpen={isSidebarOpen} routeCoords={coords} />
+          //For testing and demo
+          {isDev && routeMessage?.toLowerCase().includes("weather") && (
+            <WeatherAlertPopup
+              weatherWarnings={mockWeatherWarnings}
+              samplesEvery2km={mockSamples}
+              onClose={() => setRouteMessage('')}
+              onRegenerate={() => {
+                setCoords(null);
+                setRouteMessage('');
+                setActiveSidebarView('routeGenerator')
+              }}
+            />
+          )}
+
+          //Actual WeatherWarning
+          {!isDev && weatherWarnings.length > 0 && (
+            <WeatherAlertPopup
+              weatherWarnings={weatherWarnings}
+              samplesEvery2km={samplesEvery2km}
+              onClose={() => setWeatherWarnings([])}
+              onRegenerate={() => {
+                setCoords(null);
+                setWeatherWarnings([]);
+                setActiveSidebarView('routeGenerator');
+              }}
+            />
+          )}
         </main>
       </div>
     </>

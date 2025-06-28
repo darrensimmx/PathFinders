@@ -21,6 +21,8 @@ async function addSavedRoute(userId, routeData) {
     user: userId
   });
 
+  if (!savedRoute._id) throw new Error("Failed to create saved route: No _id returned");
+
   user.savedRoutes.push(savedRoute._id);
   await user.save();
   return user.savedRoutes[user.savedRoutes.length - 1];

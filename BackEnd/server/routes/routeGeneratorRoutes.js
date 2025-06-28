@@ -84,7 +84,7 @@ router.post('/', async (req, res) => {
     
     // 3. DEBUG: Log raw result so you can see its fields if needed
     console.log(
-      '>>>> RAW CONTROLLER RESULT:',
+      ' RAW CONTROLLER RESULT:',
       JSON.stringify(result, null, 2)
     );
     

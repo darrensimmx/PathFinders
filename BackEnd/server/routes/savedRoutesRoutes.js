@@ -28,12 +28,14 @@ router.delete('/clear-all', authenticateToken, async (req, res) => {
 // POST /api/routes/save
 router.post('/save', authenticateToken, async (req, res) => {
   try {
+    console.log("Full req.body:", req.body)
     const userId = req.user.id;
     const route = req.body.route;
-    console.log("Request UsedID: ", req.user.id)
-    console.log("Request route: ", req.body.route)
-    await addSavedRoute(userId, route);
-    res.json({message: 'Route saved successfully'})
+    console.log("Extracted route:", route)
+
+    const savedRouteId = await addSavedRoute(userId, route)
+    const savedRoute = await SavedRoute.findById(savedRouteId);
+    res.status(200).json(savedRoute)
   } catch (err) {
     res.status(400).json({message: err.message})
   }

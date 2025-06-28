@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import SidebarHeader from './SidebarHeader';
 import RouteForm from '../../Route/RouteForm';
 import FilterSelector from './FilterSelector';
-import WeatherWarningSidebar from './WeatherWarningSidebar';
 import RouteMessagePanel from '../../Route/RouteMessagePanel';
 import { FaCommentDots } from 'react-icons/fa';
 
@@ -44,12 +43,6 @@ export default function RouteGeneratorSidebar({
         setSelectedFilters={setFilters}
       />
 
-      <div className="mt-4">
-        <WeatherWarningSidebar
-          samplesEvery2km={samplesEvery2km}
-          weatherWarnings={weatherWarnings}
-        />
-      </div>
 
       <div className="mt-6">
         <RouteMessagePanel

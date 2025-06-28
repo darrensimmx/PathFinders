@@ -304,7 +304,12 @@ describe('HTML request to backend', () => {
       .send({ route: newRoute })
 
     expect(res.status).toBe(200);
-    expect(res.body.message).toBe('Route saved successfully')
+    expect(res.body).toHaveProperty('_id');
+    expect(res.body).toHaveProperty('name');
+    expect(typeof res.body.name).toBe('string');
+    expect(res.body).toHaveProperty('coordinates');
+    expect(Array.isArray(res.body.coordinates)).toBe(true);
+
   })
 
   // /api/routes - fetches all routes for user

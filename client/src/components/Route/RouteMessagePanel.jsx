@@ -23,11 +23,13 @@ export default function RouteMessagePanel({ message, distance, loading, error, o
           )}
           <button
             type="button"
-            onClick={onSave}
+            onClick={() => {
+              console.log("Saving:", currentGeneratedRoute);
+              onSave(currentGeneratedRoute);
+            }}
             className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
             <FaBookmark size={20}/>
-            {console.log("Saving: ", currentGeneratedRoute)}
           </button>
         </div>
       )}

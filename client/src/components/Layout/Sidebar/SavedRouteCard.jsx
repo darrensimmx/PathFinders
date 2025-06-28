@@ -5,6 +5,7 @@ import './SavedRouteCard.css'
 
 function SavedRouteCard({ route, onDelete, onClick }) {
   if (!route) return null;
+  console.log("Route in SavedRouteCard:", route);
   
   return (
     <div className="route-card" onClick={onClick} style={{ cursor: 'pointer' }}>
