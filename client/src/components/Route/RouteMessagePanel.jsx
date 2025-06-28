@@ -14,7 +14,7 @@ export default function RouteMessagePanel({ message, distance, loading, error, o
       )}
 
       {message && currentGeneratedRoute && (
-        <div className="bg-gray-800 text-white p-3 rounded space-y-2">
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-4 py-3 rounded-lg shadow-md mt-4 space-y-2">
           <p>{message}</p>
           {distance && (
             <p className="text-xs text-gray-400">

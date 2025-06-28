@@ -4,7 +4,7 @@ import { FaUser, FaSave, FaPlayCircle, FaComments } from 'react-icons/fa'
 
 export default function NavigationSidebar({ setActiveView, user }) {
   return (
-    <div>
+    <div className="navigation-sidebar">
       <SidebarHeader 
         subtitle="Menu"
         user={user}

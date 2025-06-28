@@ -1,6 +1,6 @@
-import MenuIcon from '../Assets/Menu.png';
+import { TiThMenu } from "react-icons/ti";
 import PathFinderIcon from '../Assets/PathFinder_icon.png';
-import LogOutIcon from '../Assets/LogOutBtn.png';
+import { RiLogoutBoxFill } from "react-icons/ri"
 
 import { useNavigate } from 'react-router-dom';
 
@@ -16,13 +16,13 @@ function Header({ toggleSidebar }) {
   return (
     <header className="header">
       <button className="hamburger" onClick={toggleSidebar}>
-        <img src={MenuIcon} alt="Menu" />
+        {<TiThMenu size={30}/>}
       </button>
       <div className='logo'>
         <img src={PathFinderIcon} alt="PathFinder Logo" />
       </div>
       <button className="logout" onClick={handleLogout}>
-        <img src={LogOutIcon} alt="Logout" /> 
+        {<RiLogoutBoxFill size={30}/>}
       </button>
     </header>
   );

@@ -6,7 +6,6 @@ import SavedRoutesSidebar from './Sidebar/SavedRoutesSidebar';
 import RouteGeneratorSidebar from './Sidebar/RouteGeneratorSidebar';
 import ContactUsSidebar from './Sidebar/ContactUsSidebar';
 
-// TODO: Use React Context to prevent Prop Drilling
 function Sidebar({
   isOpen,
   activeView,
