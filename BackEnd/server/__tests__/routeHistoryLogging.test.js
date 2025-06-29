@@ -93,12 +93,6 @@ describe('Add Route function with Mocked Data', () => {
     const savedRouteInDB = await SavedRoute.findById(savedRoutes[0]._id);
     expect(savedRouteInDB.distance).toBe(mockedData.distance);
     expect(savedRouteInDB.startPoint.coordinates).toEqual([2, 3]);
-
-    // expect(updatedUser.savedRoutes.length).toBe(1);
-    // expect(newRoute.name).toBe(mockedData.name);
-    // expect(updatedUser.savedRoutes[0].distance).toBe(mockedData.distance);
-    // expect(updatedUser.savedRoutes[0].startPoint.coordinates).toEqual([2,3]);
-    // expect(updatedUser.savedRoutes[0].endPoint.coordinates).toEqual([3,4]);
   })
   //Reject if MongoDB user already has 5 routes => warning to user
   it('should not add more than 5 saved routes', async () => {

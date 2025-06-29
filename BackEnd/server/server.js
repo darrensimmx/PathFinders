@@ -1,6 +1,7 @@
 // BackEnd/server.js
 
-require('dotenv').config();
+require('dotenv').config({ path: __dirname + '/.env' });
+console.log("ORS KEY:", process.env.ORS_API_KEY)
 const mongoose = require('mongoose');
 const app      = require('./app');
 
@@ -16,5 +17,5 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // 2. Always start the Express server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
