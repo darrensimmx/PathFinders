@@ -1,6 +1,6 @@
 // BackEnd/server/utils/weatherCheck.js
 
-// load BackEnd/.env so WEATHERAPI_KEY is always available
+// load the .env so WEATHERAPI_KEY is available
 const path = require('path');
 require('dotenv').config({
   path: path.resolve(__dirname, '../../.env')
@@ -9,11 +9,11 @@ require('dotenv').config({
 const axios = require('axios');
 
 /**
- * Compute straight‐line distance (m) between two { lat, lng } points.
+ * Compute straight-line distance (meters) between two { lat, lng } points.
  */
 function haversineDistance(pointA, pointB) {
   const toRad = deg => (deg * Math.PI) / 180;
-  const R = 6371000; // meters
+  const R = 6371000; // Earth's radius in meters
 
   const dLat = toRad(pointB.lat - pointA.lat);
   const dLng = toRad(pointB.lng - pointA.lng);
@@ -28,7 +28,8 @@ function haversineDistance(pointA, pointB) {
 }
 
 /**
- * From an array of { lat, lng }, pick points every 2 km along the route.
+ * Given an ordered array of coords (each { lat, lng }),
+ * return those coords where cumulative distance crosses each 2000 m mark.
  */
 function sampleEvery2km(routeCoords) {
   const samples = [];
@@ -47,7 +48,11 @@ function sampleEvery2km(routeCoords) {
 }
 
 /**
- * Hour object is “bad” if rain ≥50%, snow ≥50%, wind ≥30 kph, or thunderstorm code.
+ * Returns true if the hour-forecast indicates bad weather:
+ *  • chance_of_rain >= 50%
+ *  • chance_of_snow >= 50%
+ *  • wind_kph >= 30
+ *  • condition.code between 200–233 (thunderstorm)
  */
 function isBadWeather(hour) {
   const rain = hour.chance_of_rain || 0;
@@ -55,12 +60,18 @@ function isBadWeather(hour) {
   const wind = hour.wind_kph || 0;
   const code = (hour.condition && hour.condition.code) || 0;
 
-  return rain >= 50 || snow >= 50 || wind >= 30 || (code >= 200 && code <= 233);
+  return (
+    rain >= 50 ||
+    snow >= 50 ||
+    wind >= 30 ||
+    (code >= 200 && code <= 233)
+  );
 }
 
 /**
- * For each sampled point, fetch next-day forecast, take 6 upcoming hours,
- * filter bad‐weather hours, and return an array of { lat, lng, badHours }.
+ * For each sampled point ({ lat, lng }), fetch the next-day forecast,
+ * take the next 6 upcoming hours, filter for bad weather, and
+ * return an array of { lat, lng, badHours }.
  */
 async function getWeatherWarnings(sampledPoints) {
   const apiKey = process.env.WEATHERAPI_KEY;
@@ -71,8 +82,9 @@ async function getWeatherWarnings(sampledPoints) {
   const warnings = [];
 
   for (const pt of sampledPoints) {
+    console.log(`[weatherCheck] calling WeatherAPI for ${pt.lat},${pt.lng}`);
     try {
-      const res = await axios.get(
+      const response = await axios.get(
         'http://api.weatherapi.com/v1/forecast.json',
         {
           params: {
@@ -85,31 +97,52 @@ async function getWeatherWarnings(sampledPoints) {
         }
       );
 
-      const hours = res.data.forecast.forecastday[0].hour;
+      const hours = response.data.forecast.forecastday[0].hour;
+
+      // find the next full-hour timestamp
       const nowMs = Date.now();
-      const nextHour = Math.ceil(nowMs / 3600000) * 3600000;
+      const nextHourTs = Math.ceil(nowMs / 3600000) * 3600000;
 
-      let start = hours.findIndex(h => {
+      // locate first forecast hour ≥ that boundary
+      let startIdx = hours.findIndex(h => {
         const ts = new Date(h.time.replace(' ', 'T')).getTime();
-        return ts >= nextHour;
+        return ts >= nextHourTs;
       });
-      if (start < 0) start = 0;
+      if (startIdx < 0) startIdx = 0;
 
-      const upcoming = hours.slice(start, start + 6);
-      const badHours = upcoming.filter(isBadWeather).map(h => ({
-        time: h.time,
-        condition: h.condition.text,
-        chance_of_rain: h.chance_of_rain,
-        chance_of_snow: h.chance_of_snow,
-        wind_kph: h.wind_kph
-      }));
+      // grab the next 6 hours from that index
+      const upcoming = hours.slice(startIdx, startIdx + 6);
 
-      if (badHours.length) {
+      // filter for bad weather
+      const badHours = upcoming
+        .filter(isBadWeather)
+        .map(h => ({
+          time: h.time,                   // e.g. "2025-06-06 15:00"
+          condition: h.condition.text,    // e.g. "Light rain"
+          chance_of_rain: h.chance_of_rain,
+          chance_of_snow: h.chance_of_snow,
+          wind_kph: h.wind_kph
+        }));
+
+      if (badHours.length > 0) {
         warnings.push({ lat: pt.lat, lng: pt.lng, badHours });
       }
     } catch (err) {
-      console.warn(`WeatherAPI error at ${pt.lat},${pt.lng}: ${err.message}`);
+      console.warn(
+        `[weatherCheck] WeatherAPI error at ${pt.lat},${pt.lng}:`,
+        err.message
+      );
     }
+  }
+
+  // summary log
+  if (warnings.length === 0) {
+    console.log('[weatherCheck] all clear: no bad weather detected');
+  } else {
+    console.log(
+      `[weatherCheck] returning ${warnings.length} warning(s):`,
+      warnings
+    );
   }
 
   return warnings;
