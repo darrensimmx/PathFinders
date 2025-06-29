@@ -14,6 +14,7 @@ export default function RouteGeneratorSidebar({
   routeDistance,
   loading,
   error,
+  success,
   onSave,
   currentGeneratedRoute,
   samplesEvery2km,
@@ -50,6 +51,7 @@ export default function RouteGeneratorSidebar({
           distance={routeDistance}
           loading={loading}
           error={error}
+          success={success}
           onSave={() => onSave(currentGeneratedRoute)}
           currentGeneratedRoute={currentGeneratedRoute}
         />

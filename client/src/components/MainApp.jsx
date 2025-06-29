@@ -18,6 +18,7 @@ export default function MainApp() {
   const [routeMessage, setRouteMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState('');
 
   // Save route feature
   const [savedRoutes, setSavedRoutes] = useState([]);
@@ -85,13 +86,27 @@ export default function MainApp() {
 
       if (!res.ok) throw new Error(await res.text());
       console.log('Route saved successfully');
+      setSuccess('Route saved successfully!');
+      setTimeout(() => setSuccess(''), 3000);
       const saved = await res.json();
 
       const newRoute = { ...route, _id: saved._id, createdAt: new Date() };
       setSavedRoutes((prev) => [...prev, newRoute]);
       console.log("Attempting to save route:", route);
+      setError('')
     } catch (err) {
       console.error('Failed to save route:', err);
+
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed.message === "Limit of 5 saved routes for free plan.") {
+          setError("You’ve reached the free limit of 5 saved routes. Please delete one to save a new route.");
+        } else {
+          setError(parsed.message || "An unexpected error occurred.");
+        }
+      } catch {
+        setError("An unexpected error occurred.");
+      }
     }
   }
 
@@ -255,6 +270,7 @@ export default function MainApp() {
           routeDistance={routeDistance}
           loading={loading}
           error={error}
+          success={success}
           handleSaveRoute={handleSaveRoute}
           routes={savedRoutes}
           onDeleteRoute={handleDeleteRoute}

@@ -15,6 +15,7 @@ function Sidebar({
   routeDistance,
   loading,
   error,
+  success,
   handleSaveRoute,
   routes,
   onClearAll,
@@ -56,6 +57,7 @@ function Sidebar({
           routeDistance={routeDistance}
           loading={loading}
           error={error}
+          success={success}
           onSave={handleSaveRoute}
           currentGeneratedRoute={currentGeneratedRoute}
           samplesEvery2km={samplesEvery2km}

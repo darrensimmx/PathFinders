@@ -2,7 +2,7 @@
 import React from 'react';
 import { FaBookmark } from 'react-icons/fa'
 
-export default function RouteMessagePanel({ message, distance, loading, error, onSave, currentGeneratedRoute }) {
+export default function RouteMessagePanel({ message, distance, loading, error, success, onSave, currentGeneratedRoute }) {
   return (
     <div className="mt-4 text-sm">
       {loading && (
@@ -10,9 +10,13 @@ export default function RouteMessagePanel({ message, distance, loading, error, o
       )}
 
       {error && (
-        <p className="text-red-500">{error}</p>
+        <p className="!text-red-500 text-sm italic mt-2">{error}</p>
       )}
 
+      {success && (
+        <p className="!text-green-400 text-sm italic mt-2">{success}</p>
+      )}
+      
       {message && currentGeneratedRoute && (
         <div className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-4 py-3 rounded-lg shadow-md mt-4 space-y-2">
           <p>{message}</p>
