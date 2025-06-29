@@ -1,5 +1,3 @@
-// client/src/components/WeatherAlertPopup.jsx
-
 import React from 'react';
 
 export default function WeatherAlertPopup({
@@ -12,15 +10,12 @@ export default function WeatherAlertPopup({
 
   return (
     <div className="
-      absolute bottom-4 left-1/2 transform -translate-x-1/2
       w-[90%] max-w-xl bg-white shadow-xl rounded-xl border border-gray-200
       p-0 z-[1000]
     ">
       {/* Header */}
-      <div className={`
-        flex items-center justify-between px-4 py-2 rounded-t-xl
-        ${hasWarnings ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}
-      `}>
+      <div className={`flex items-center justify-between px-4 py-2 rounded-t-xl
+        ${hasWarnings ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
         <h3 className="font-semibold text-lg">
           {hasWarnings ? '⚠️ Weather Warning' : '✅ All Clear'}
         </h3>
@@ -33,10 +28,10 @@ export default function WeatherAlertPopup({
         </button>
       </div>
 
-      {/* Body */}
-      <div className="px-6 py-4">
+      {/* Body with scrollable warning list */}
+      <div className="px-6 py-4 max-h-[25vh] overflow-y-auto">
         {hasWarnings ? (
-          <ul className="list-disc pl-5 space-y-1 text-gray-800">
+          <ul className="list-disc pl-5 space-y-1 text-gray-800 pr-2">
             {weatherWarnings.map((warn, i) => {
               const idx = samplesEvery2km.findIndex(
                 pt => pt.lat === warn.lat && pt.lng === warn.lng
@@ -58,9 +53,7 @@ export default function WeatherAlertPopup({
             })}
           </ul>
         ) : (
-          <p className="text-gray-700">
-            No bad weather detected along your route.
-          </p>
+          <p className="text-gray-700">No bad weather detected along your route.</p>
         )}
       </div>
 

@@ -1,5 +1,3 @@
-// client/src/components/Layout/Sidebar/RouteGeneratorSidebar.jsx
-
 import React, { useState } from 'react';
 import SidebarHeader from './SidebarHeader';
 import RouteForm from '../../Route/RouteForm';
@@ -25,6 +23,7 @@ export default function RouteGeneratorSidebar({
   const availableFilters = ['Elevation 15%', 'GBTB', 'No Traffic Light'];
 
   const onFormSubmit = (formData) => {
+    console.log("✅ Form submitted from RouteGeneratorSidebar:", formData, filters);
     handleGenerate(formData, filters);
   };
 
@@ -43,7 +42,6 @@ export default function RouteGeneratorSidebar({
         selectedFilters={filters}
         setSelectedFilters={setFilters}
       />
-
 
       <div className="mt-6">
         <RouteMessagePanel
