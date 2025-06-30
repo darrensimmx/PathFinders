@@ -1,3 +1,5 @@
+//client/src/components/Layout/Sidebar/WeatherWarningSidebar.jsx
+
 import React from 'react';
 
 export default function WeatherWarningSidebar({

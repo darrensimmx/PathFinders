@@ -1,18 +1,17 @@
-// components/MainApp.jsx
+// client/src/components/MainApp.jsx
 
 import React, { useState, useEffect } from 'react';
 import Header from './Layout/Header';
 import Sidebar from './Layout/Sidebar';
 import RouteMap from '../RouteMap';
+import WeatherAlertPopup from './WeatherAlertPopUp';
 import './Layout/Layout.css';
 import { geocode } from '../../utils/geocode';
-import WeatherAlertPopup from './WeatherAlertPopUp';
 
 export default function MainApp() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeSidebarView, setActiveSidebarView] = useState('navigation');
 
-  // Shared route state
   const [coords, setCoords] = useState(null);
   const [routeDistance, setRouteDistance] = useState(null);
   const [routeMessage, setRouteMessage] = useState('');
@@ -20,39 +19,32 @@ export default function MainApp() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState('');
 
-  // Save route feature
   const [savedRoutes, setSavedRoutes] = useState([]);
   const [currentGeneratedRoute, setCurrentGeneratedRoute] = useState(null);
   const [user, setUser] = useState(null);
-  const accessToken = localStorage.getItem('accessToken');
-
-  // Weather feature
   const [weatherWarnings, setWeatherWarnings] = useState([]);
   const [samplesEvery2km, setSamplesEvery2km] = useState([]);
-  const isDev = process.env.NODE_ENV === 'development'; // just to show the weather warning for dev mode
 
+  const [lastGenerateArgs, setLastGenerateArgs] = useState(null);
+  const [popupVisible, setPopupVisible] = useState(false);
+
+  const accessToken = localStorage.getItem('accessToken');
 
   // Fetch saved routes
   useEffect(() => {
     const fetchSavedRoutes = async () => {
       try {
         const res = await fetch('/api/saved-routes', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
-
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         setSavedRoutes(data.routes);
       } catch (err) {
-        console.log('MainApp.jsx => Failed to fetch saved routes:', err);
+        console.log('Failed to fetch saved routes:', err);
       }
     };
-
-    if (accessToken) {
-      fetchSavedRoutes();
-    }
+    if (accessToken) fetchSavedRoutes();
   }, [accessToken]);
 
   // Fetch user info
@@ -69,7 +61,6 @@ export default function MainApp() {
         console.error('Failed to fetch user:', err);
       }
     };
-
     if (accessToken) fetchUser();
   }, [accessToken]);
 
@@ -85,18 +76,13 @@ export default function MainApp() {
       });
 
       if (!res.ok) throw new Error(await res.text());
-      console.log('Route saved successfully');
-      setSuccess('Route saved successfully!');
-      setTimeout(() => setSuccess(''), 3000);
       const saved = await res.json();
-
       const newRoute = { ...route, _id: saved._id, createdAt: new Date() };
       setSavedRoutes((prev) => [...prev, newRoute]);
-      console.log("Attempting to save route:", route);
-      setError('')
+      setSuccess('Route saved successfully!');
+      setTimeout(() => setSuccess(''), 3000);
+      setError('');
     } catch (err) {
-      console.error('Failed to save route:', err);
-
       try {
         const parsed = JSON.parse(err.message);
         if (parsed.message === "Limit of 5 saved routes for free plan.") {
@@ -114,14 +100,9 @@ export default function MainApp() {
     try {
       const res = await fetch(`/api/saved-routes/${routeId}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
-
       if (!res.ok) throw new Error(await res.text());
-      console.log('Route deleted');
-
       setSavedRoutes((prev) => prev.filter((r) => r._id !== routeId));
     } catch (err) {
       console.error('Failed to delete route:', err);
@@ -132,37 +113,38 @@ export default function MainApp() {
     try {
       const res = await fetch('/api/saved-routes/clear-all', {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
-
       if (!res.ok) throw new Error(await res.text());
-      console.log('All routes cleared');
       setSavedRoutes([]);
     } catch (err) {
       console.error('Failed to clear all routes:', err);
     }
   }
 
-  async function handleGenerate({ start: startInput, end: endInput, distance, routeType }, filters) {
+  async function handleGenerate(formData, filters) {
+    setLastGenerateArgs({ formData, filters });
+
     setLoading(true);
     setError(null);
     setRouteMessage('');
     setCoords(null);
     setRouteDistance(null);
+    setWeatherWarnings([]);
+    setSamplesEvery2km([]);
+    setPopupVisible(false);
 
     try {
-      const start = await geocode(startInput);
-      let end = null;
+      const start = await geocode(formData.start);
+      const end = formData.routeType !== 'loop' ? await geocode(formData.end) : null;
 
-      if (routeType !== 'loop') {
-        end = await geocode(endInput);
-      }
-
-      const payload = routeType === 'loop'
-        ? { start, distance, routeType, filters }
-        : { start, end, distance, routeType, filters };
+      const payload = {
+        start,
+        ...(end && { end }),
+        distance: formData.distance,
+        routeType: formData.routeType,
+        filters,
+      };
 
       const res = await fetch('http://localhost:4000/api/route', {
         method: 'POST',
@@ -170,55 +152,46 @@ export default function MainApp() {
         body: JSON.stringify(payload),
       });
 
-      const apiResponse = await res.json();
-
-      if (!res.ok || apiResponse.success === false) {
-        throw new Error(await res.text() || 'Request failed.');
+      const apiRes = await res.json();
+      if (!res.ok || apiRes.success === false) {
+        throw new Error(apiRes.message || 'Route generation failed');
       }
 
-      const geoJson = apiResponse.geojson;
-      if (!geoJson || !Array.isArray(geoJson.coordinates)) {
-        throw new Error('Server returned invalid route coordinates.');
-      }
+      const {
+        geojson,
+        type,
+        warning,
+        actualDist,
+        weatherWarnings: ww,
+        samplesEvery2km: s2k,
+      } = apiRes;
 
-      const { type, warning, actualDist, weatherWarnings: ww, samplesEvery2km: s2k } = apiResponse;
       setWeatherWarnings(ww || []);
       setSamplesEvery2km(s2k || []);
+      setPopupVisible(true); // show weather popup after generation
 
-      const latLngs = geoJson.coordinates.map(([lng, lat]) => [lat, lng]);
+      const latLngs = geojson.coordinates.map(([lng, lat]) => [lat, lng]);
       setCoords(latLngs);
       setRouteDistance(actualDist);
 
-      const distKm = (actualDist / 1000).toFixed(2);
-      if (warning) {
-        setRouteMessage(warning);
-      } else if (type === 'shortest') {
-        setRouteMessage(
-          `Shortest route between ${startInput} and ${endInput} is ${distKm} km long`
-        );
-      } else {
-        setRouteMessage(
-          routeType === 'loop'
-            ? `Generated a ${distKm} km route around ${startInput}`
-            : `Generated a ${distKm} km route between ${startInput} and ${endInput}`
-        );
-      }
+      const km = (actualDist / 1000).toFixed(2);
+      let msg;
+      if (warning) msg = warning;
+      else if (type === 'shortest') msg = `Shortest route is ${km} km`;
+      else if (formData.routeType === 'loop') msg = `Generated a ${km} km loop`;
+      else msg = `Generated a ${km} km route`;
+      setRouteMessage(msg);
 
       setCurrentGeneratedRoute({
-        name:
-          routeType === 'loop'
-            ? `Loop around ${startInput}`
-            : `Route from ${startInput} to ${endInput}`,
-        distance: Number(distKm),
-        coordinates: geoJson.coordinates,
+        name: formData.routeType === 'loop'
+          ? `Loop around ${formData.start}`
+          : `Route from ${formData.start} to ${formData.end}`,
+        distance: actualDist,
+        coordinates: geojson.coordinates,
         startPoint: { type: 'Point', coordinates: [start.lng, start.lat] },
-        endPoint: {
-          type: 'Point',
-          coordinates:
-            routeType === 'loop'
-              ? [start.lng, start.lat]
-              : [end.lng, end.lat],
-        },
+        endPoint: formData.routeType === 'loop'
+          ? { type: 'Point', coordinates: [start.lng, start.lat] }
+          : { type: 'Point', coordinates: [end.lng, end.lat] },
       });
     } catch (e) {
       setError(`Route generation failed: ${e.message}`);
@@ -228,39 +201,17 @@ export default function MainApp() {
   }
 
   function handleSelectRoute(route) {
-    if (!route || !route.coordinates) return;
-
-    const latLngs = route.coordinates.map(([lng, lat]) => [lat, lng]);
-    setCoords(latLngs);
+    if (!route?.coordinates) return;
+    setCoords(route.coordinates.map(([lng, lat]) => [lat, lng]));
     setRouteMessage(`Showing saved route: ${route.name}`);
     setRouteDistance(route.distance);
   }
 
-  const mockWeatherWarnings = [
-    {
-      lat: 1.3,
-      lng: 103.8,
-      badHours: [
-        {time: '2.00 PM', condition: 'Thunderstorm'},
-        {time: '4.00 PM', condition: 'Heavy Rain'}
-      ]
-    }
-  ]
-
-  const mockSamples = [
-    {lat: 1.3, lng: 103.8},
-    {lat: 1.35, lng: 103.82}
-  ]
-
-  useEffect(() => {
-    setRouteMessage("Bad weather detected along your route: possible thunderstorm.");
-  }, []);
-
-
   return (
     <>
       <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-      <div className="app-container">
+
+      <div className="app-container flex h-screen">
         <Sidebar
           isOpen={isSidebarOpen}
           activeView={activeSidebarView}
@@ -280,34 +231,23 @@ export default function MainApp() {
           user={user}
         />
 
-        <main className="map-wrapper">
+        <main className="map-wrapper flex-1 relative">
           <RouteMap sidebarOpen={isSidebarOpen} routeCoords={coords} />
-          //For testing and demo
-          {isDev && routeMessage?.toLowerCase().includes("weather") && (
-            <WeatherAlertPopup
-              weatherWarnings={mockWeatherWarnings}
-              samplesEvery2km={mockSamples}
-              onClose={() => setRouteMessage('')}
-              onRegenerate={() => {
-                setCoords(null);
-                setRouteMessage('');
-                setActiveSidebarView('routeGenerator')
-              }}
-            />
-          )}
 
-          //Actual WeatherWarning
-          {!isDev && weatherWarnings.length > 0 && (
-            <WeatherAlertPopup
-              weatherWarnings={weatherWarnings}
-              samplesEvery2km={samplesEvery2km}
-              onClose={() => setWeatherWarnings([])}
-              onRegenerate={() => {
-                setCoords(null);
-                setWeatherWarnings([]);
-                setActiveSidebarView('routeGenerator');
-              }}
-            />
+          {popupVisible && (
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center z-[9999] px-4">
+              <WeatherAlertPopup
+                weatherWarnings={weatherWarnings}
+                samplesEvery2km={samplesEvery2km}
+                onClose={() => setPopupVisible(false)}
+                onRegenerate={() => {
+                  setPopupVisible(false);
+                  if (lastGenerateArgs) {
+                    handleGenerate(lastGenerateArgs.formData, lastGenerateArgs.filters);
+                  }
+                }}
+              />
+            </div>
           )}
         </main>
       </div>
