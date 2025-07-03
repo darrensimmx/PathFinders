@@ -2,14 +2,14 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const PasswordInput = ({ value, onChange }) => {
+const PasswordInput = ({ value, onChange, placeholder="Password" }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="input-box">
       <input
         type={showPassword ? 'text' : 'password'}
-        placeholder="Password"
+        placeholder={placeholder}
         value={value}
         onChange={onChange}
         required

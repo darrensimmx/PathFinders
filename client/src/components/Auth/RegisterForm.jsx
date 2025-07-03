@@ -12,10 +12,17 @@ const RegisterForm = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    //Check if password matches
+    if (confirmPassword !== password) {
+      alert("Passwords do not match.");
+      return;
+    }
     try {
       const response = await axios.post('http://localhost:4000/api/signup', {
         name, 
@@ -55,11 +62,17 @@ const RegisterForm = () => {
             icon={<RiMailAddFill />}
           />
 
-           <PasswordInput
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           
+          <PasswordInput
+            value={confirmPassword}
+            placeholder="Confirm Password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+
           <button type="submit" className="bg-blue-600 text-white py-2 rounded">Register</button>
 
           <div className="register-link">
