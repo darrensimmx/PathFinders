@@ -21,7 +21,6 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
   const { dist: shortestDist, coords: shortestCoords } = shortest;
 
   // Step 0.5: Compare and override if needed
-  let warning = null;
   if (baseM < shortestDist) {
     return {
       type: 'shortest',
@@ -33,11 +32,15 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
 
   // Step 1: Generate a loop route with corners to extract D - A
   const loopData = await generateLoopRoute(start, targetKm, { returnCorners: true });
+  if (!loopData?.corners || Object.values(loopData.corners).some(c => !c)) {
+    throw new Error('generateDirectRoute failed: loop route did not return valid corners');
+  }
+
   const { A, B, C, D } = loopData.corners;
 
   // Step 2: Measure distance from D - A (final leg of loop)
   const daSegment = await getWalkingRoute(D, A);
-  if (!daSegment || daSegment.error || !daSegment.dist) {
+  if (!daSegment || daSegment.error || !daSegment.dist || daSegment.dist === 0) {
     throw new Error('Failed to calculate D - A distance');
   }
 
@@ -46,7 +49,11 @@ async function generateDirectRoute(start, end, targetKm, attempts = 1, best = { 
 
   // Step 4: Regenerate the loop with the longer distance
   const adjustedLoop = await generateLoopRoute(start, adjustedKm, { returnCorners: true });
-  console.log("adjusted loop: ", adjustedLoop)
+
+  if (!adjustedLoop?.corners || Object.values(adjustedLoop.corners).some(c => !c || isNaN(c.lat) || isNaN(c.lng))) {
+    throw new Error('generateDirectRoute failed: Invalid corners from adjusted loop');
+  }
+  
   const { A: A2, B: B2, C: C2 } = adjustedLoop.corners;
 
   // Step 5: Build a custom direct route A - B - C - end

@@ -12,7 +12,7 @@ jest.mock('axios');
 const {
   sampleEvery2km,
   getWeatherWarnings
-} = require('../utils/weatherCheck');
+} = require('../../utils/weatherCheck');
 
 // remember original key so we can restore it after unit tests
 const originalKey = process.env.WEATHERAPI_KEY;
@@ -102,7 +102,7 @@ describeFunc('getWeatherWarnings (functional)', () => {
   beforeAll(() => {
     jest.unmock('axios');
     jest.resetModules();
-    realGetWeatherWarnings = require('../utils/weatherCheck').getWeatherWarnings;
+    realGetWeatherWarnings = require('../../utils/weatherCheck').getWeatherWarnings;
   });
 
   it('fetches live data and returns structured warnings', async () => {

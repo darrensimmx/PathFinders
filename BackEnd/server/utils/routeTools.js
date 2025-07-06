@@ -24,7 +24,29 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
     snappedCorners.push(snapped);
   }
 
-  // existing route generation logic...
+  const { coords, dist } = await getWalkingRoute(snappedCorners[0], snappedCorners[2]);
+
+  if (isRouteInRestrictedArea(coords)) {
+    throw new Error('Route enters a restricted area');
+  }
+
+  const routeGeoJSON = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: coords,
+        },
+      },
+    ],
+  };
+
+  const actualDist = dist;
+  const warningMessage = '';
+  const weatherWarnings = [];
+  const samplesEvery2km = [];
 
   return {
     geojson: routeGeoJSON,
@@ -33,7 +55,10 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
     type: 'rectangle',
     weatherWarnings,
     samplesEvery2km,
-    rectangleCorners: snappedCorners, // <--- include this
+    rectangleCorners: snappedCorners,
+    snappedCorners,
+    coords,
+    dist
   };
 }
 
@@ -67,7 +92,10 @@ async function snapRectangleLoop(start, totalM) {
   }
 
   if (!best.route) throw new Error('No valid rectangle route found');
-  return best;
+  return {
+    route: best.route,
+    corners: best.corners
+  };
 }
 
 module.exports = {

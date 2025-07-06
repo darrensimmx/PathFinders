@@ -7,9 +7,9 @@ const { MongoMemoryServer } = require('mongodb-memory-server')
 // Note to self: describe is used with multiple it(..) to test a fn w multiple test cases
 // For just a specific standalone case, can use test(..) instead
 
-const loginMock = require('../controllers/authController').loginMock;
-const signUpMock = require('../controllers/authController').signUpMock;
-const app = require('../app');
+const loginMock = require('../../controllers/authController').loginMock;
+const signUpMock = require('../../controllers/authController').signUpMock;
+const app = require('../../app');
 //console.log('typeof app:', typeof app);
 
 // Login/sign up feature

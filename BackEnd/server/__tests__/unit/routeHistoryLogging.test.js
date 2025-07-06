@@ -26,13 +26,13 @@ geoJson returned from routeGenerator function
  */
 
 /************************************UNIT TEST ************************************/
-const SavedRoute = require('../models/savedRouteModel');
+const SavedRoute = require('../../models/savedRouteModel');
 
 const { default: mongoose } = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server')
-const User = require("../models/userModel");
-const { addSavedRoute, fetchSavedRoutes, fetchSingleRoute, removeSavedRoute } = require('../controllers/routeController');
-const { route } = require('../app');
+const User = require("../../models/userModel");
+const { addSavedRoute, fetchSavedRoutes, fetchSingleRoute, removeSavedRoute } = require('../../controllers/routeController');
+const { route } = require('../../app');
 
 /**********Mocked Data **********/
 let mongoServer;
@@ -260,10 +260,10 @@ describe('Delete Route Fn with Mocked Data', () => {
 /*********Actual Data ***********/
 
 /************************************INTEGRATION TEST ************************************/
-const app = require('../app')
+const app = require('../../app')
 const request = require('supertest') // to test for html request to the backend
 const jwt = require('jsonwebtoken');
-const { SECRET } = require('../config');
+const { SECRET } = require('../../config');
 
 /**********Mocked Data **********/
 let accessToken;
