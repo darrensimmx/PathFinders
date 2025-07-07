@@ -24,7 +24,9 @@ async function snapAndRouteRectangle(start, end, dh, dw, signH, signW) {
     snappedCorners.push(snapped);
   }
 
-  const { coords, dist } = await getWalkingRoute(snappedCorners[0], snappedCorners[2]);
+  const loopPath = [...snappedCorners, snappedCorners[0]]; // ensure it returns to start
+  const waypoints = loopPath.slice(1, -1); // B, C, D
+  const { coords, dist } = await getWalkingRoute(loopPath[0], loopPath.at(-1), waypoints);
 
   if (isRouteInRestrictedArea(coords)) {
     throw new Error('Route enters a restricted area');
