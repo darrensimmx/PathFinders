@@ -27,7 +27,7 @@ jest.mock('../../utils/restrictionChecks', () => ({
   isRouteInRestrictedArea: jest.fn(() => false)
 }));
 
-describe('Integration: generateDirectRoute', () => {
+describe('[INTEGRATION] generateDirectRoute', () => {
   it('generates a valid direct route with fallback loop', async () => {
     const start = { lat: 1.0, lng: 103.0 };
     const end = { lat: 1.005, lng: 103.005 };

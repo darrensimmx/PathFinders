@@ -2,7 +2,7 @@
 const request = require('supertest');
 const app = require('../../app'); // Express app
 
-describe('E2E: /api/route', () => {
+describe('[E2E] /api/route', () => {
   it('should return a valid loop route response', async () => {
     const response = await request(app).post('/api/route').send({
       routeType: 'loop',

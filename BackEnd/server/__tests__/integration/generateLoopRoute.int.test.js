@@ -33,7 +33,7 @@ jest.mock('../../utils/restrictionChecks', () => ({
   isRouteInRestrictedArea: jest.fn(() => false)
 }));
 
-describe('Integration: generateLoopRoute', () => {
+describe('[INTEGRATION] generateLoopRoute', () => {
   it('returns a valid rectangle loop route with corners', async () => {
     const start = { lat: 1.0, lng: 103.0 };
     const dist = 1; // km
