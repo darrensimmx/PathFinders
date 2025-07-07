@@ -17,7 +17,7 @@ const {
 // remember original key so we can restore it after unit tests
 const originalKey = process.env.WEATHERAPI_KEY;
 
-describe('sampleEvery2km', () => {
+describe('[UNIT] sampleEvery2km', () => {
   it('samples points at ~2km and ~4km on a 5km straight line', () => {
     const coords = [];
     for (let i = 0; i <= 5; i++) {
@@ -30,7 +30,7 @@ describe('sampleEvery2km', () => {
   });
 });
 
-describe('getWeatherWarnings (unit)', () => {
+describe('[UNIT] getWeatherWarnings', () => {
   const clearHour = {
     time: '1970-01-01 00:00',
     chance_of_rain: 0,
@@ -96,7 +96,7 @@ describe('getWeatherWarnings (unit)', () => {
 const hasRealKey = Boolean(originalKey);
 const describeFunc = hasRealKey ? describe : describe.skip;
 
-describeFunc('getWeatherWarnings (functional)', () => {
+describeFunc('[FUNCTIONAL] getWeatherWarnings', () => {
   let realGetWeatherWarnings;
 
   beforeAll(() => {

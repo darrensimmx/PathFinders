@@ -5,7 +5,7 @@ const polyline = require('@mapbox/polyline');
 jest.mock('axios'); //Tells Jest to replace the real axios w a mocked version
 
 /******************************************************* UNIT TEST*************************************************/ 
-describe('snapToWalkingPath', () => {
+describe('[UNIT] snapToWalkingPath', () => {
   const lat = 1.3521;
   const lng = 103.8198;
 
@@ -76,7 +76,7 @@ describe('snapToWalkingPath', () => {
   });
 });
 
-describe('getWalkingRoute', () => {
+describe('[UNIT] getWalkingRoute', () => {
   afterEach(() => {
     jest.clearAllMocks();
   })

@@ -50,7 +50,7 @@ const { snapToWalkingPath, getWalkingRoute } = require('../../utils/googleReques
 const { metreToDeg, rectangleCorners, haversineDistance } = require('../../utils/geoUtils');
 const { isOnLand } = require('../../utils/landChecks');
 
-describe('snapRectangleLoop', () => {
+describe('[UNIT] snapRectangleLoop', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(Math, 'random').mockReturnValue(0.5); // deterministic h

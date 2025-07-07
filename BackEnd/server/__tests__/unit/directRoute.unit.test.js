@@ -8,7 +8,7 @@ const { getWalkingRoute } = require('../../utils/googleRequest');
 jest.mock('../../controllers/looproute');
 jest.mock('../../utils/googleRequest');
 
-describe('generateDirectRoute', () => {
+describe('[UNIT] generateDirectRoute', () => {
   const start = { lat: 1.0, lng: 103.0 };
   const end = { lat: 1.002, lng: 103.002 };
 
