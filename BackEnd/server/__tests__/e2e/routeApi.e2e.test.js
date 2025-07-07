@@ -6,7 +6,7 @@ describe('[E2E] /api/route', () => {
   it('should return a valid loop route response', async () => {
     const response = await request(app).post('/api/route').send({
       routeType: 'loop',
-      start: { lat: 1.3521, lng: 103.8198 },
+      start: { lat: 1.3008, lng: 103.8725 },
       distance: 1 // 1km
     });
 
@@ -22,8 +22,8 @@ describe('[E2E] /api/route', () => {
   it('should return a valid direct route response', async () => {
     const response = await request(app).post('/api/route').send({
       routeType: 'direct',
-      start: { lat: 1.3521, lng: 103.8198 },
-      end:   { lat: 1.3535, lng: 103.8265 },
+      start: { lat: 1.3008, lng: 103.8725 },
+      end:   { lat: 1.2992, lng: 103.8739 },
       distance: 1
     });
 
@@ -59,7 +59,7 @@ describe('[E2E] /api/route', () => {
   it('should return 400 if direct route is missing end', async () => {
     const response = await request(app).post('/api/route').send({
       routeType: 'direct',
-      start: { lat: 1.3521, lng: 103.8198 },
+      start: { lat: 1.3008, lng: 103.8725 },
       distance: 1
     });
 

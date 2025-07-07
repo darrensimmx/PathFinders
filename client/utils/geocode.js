@@ -1,23 +1,12 @@
-export async function geocode(location) {
-  const apiKey = '71258f892f8443028318585b67df61c2';
-
-  if (typeof location !== 'string') {
-    throw new Error(`Invalid location input: expected string but got ${typeof location}`);
-  }
-
-  const trimmed = location.trim();
-  const fallback = /^\d{6}$/.test(trimmed)
-    ? `${trimmed}, Singapore`
-    : `${trimmed} Singapore`;
-
-  const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(fallback)}&key=${apiKey}&limit=1&countrycode=sg`;
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Geocoding API failed');
-
+export async function geocodePlace(placeName) {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`
+  );
   const data = await res.json();
-  if (!data.results.length) throw new Error("No results found for " + location);
+  if (data.length === 0) return null;
 
-  const { lat, lng } = data.results[0].geometry;
-  return { lat, lng };
+  return {
+    lat: parseFloat(data[0].lat),
+    lng: parseFloat(data[0].lon),
+  };
 }

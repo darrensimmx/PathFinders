@@ -45,8 +45,40 @@ function haversineDistance(a, b) {
   return R * c;
 }
 
+const GOOGLE_KEY = process.env.GOOGLE_API_KEY;
+
+async function geocodePlace(placeName) {
+  try {
+    const res = await axios.get(
+      'https://maps.googleapis.com/maps/api/geocode/json',
+      {
+        params: {
+          address: placeName,
+          key: GOOGLE_KEY
+        }
+      }
+    );
+
+    if (
+      res.data.status === 'ZERO_RESULTS' ||
+      !res.data.results ||
+      res.data.results.length === 0
+    ) {
+      return undefined;  // Gracefully return undefined instead of throwing
+    }
+
+    const { lat, lng } = res.data.results[0].geometry.location;
+    return { lat, lng };
+  } catch (err) {
+    console.error('[Geocode Error]', err.response?.data || err.message);
+    return undefined;
+  }
+}
+
+
 module.exports = {
     metreToDeg,
     rectangleCorners,
-    haversineDistance
+    haversineDistance,
+    geocodePlace
 }
