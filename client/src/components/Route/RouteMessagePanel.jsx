@@ -1,8 +1,10 @@
 //For Route Generated text and save icon
-import React from 'react';
+import React, {useState} from 'react';
 import { FaBookmark } from 'react-icons/fa'
 
 export default function RouteMessagePanel({ message, distance, loading, error, success, onSave, currentGeneratedRoute }) {
+  const [saved, setSaved] = useState(false)
+
   return (
     <div className="mt-4 text-sm">
       {loading && (
@@ -28,12 +30,16 @@ export default function RouteMessagePanel({ message, distance, loading, error, s
           <button
             type="button"
             onClick={() => {
-              console.log("Saving:", currentGeneratedRoute);
-              onSave(currentGeneratedRoute);
+              if (!saved) {
+                console.log("Saving:", currentGeneratedRoute);
+                onSave(currentGeneratedRoute);
+                setSaved(true)
+              }
             }}
-            className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2"
           >
             <FaBookmark size={20}/>
+            <span>{saved? 'Saved!' : 'Save Route'}</span>
           </button>
         </div>
       )}
