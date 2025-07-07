@@ -1,6 +1,7 @@
 // client/src/components/Route/RouteForm.jsx
 import React, { useState } from 'react';
 import FormInput from '../Auth/FormInput';
+import { geocodePlace } from '../../../utils/geocode';
 
 export default function RouteForm({ onGenerate }) {
   const [start, setStart] = useState('');
@@ -8,7 +9,7 @@ export default function RouteForm({ onGenerate }) {
   const [distance, setDistance] = useState('');
   const [routeType, setRouteType] = useState('loop'); // default to loop
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     console.log("Form submitted with:", { start, end, distance, routeType });
 
@@ -17,19 +18,39 @@ export default function RouteForm({ onGenerate }) {
       alert("Start and distance are required.");
       return;
     }
+    const resolvedStart = await geocodePlace(start);
+    if (!resolvedStart) {
+        alert("We couldn't find the starting location. Please try another.");
+        return;
+    }
+
+    let resolvedEnd = null;
+    if (routeType === 'direct') {
+        if (!end) {
+          alert("End point is required for direct routes.");
+          return;
+        }
+
+        resolvedEnd = await geocodePlace(end);
+        if (!resolvedEnd) {
+          alert("We couldn't find the end location. Please try another.");
+          return;
+        }
+      }
+
 
     // If routeType is 'loop', ignore end field
     const formData = {
-  start,
-  distance,
-  routeType,
-};
+      start,
+      distance,
+      routeType,
+    };
 
-if (routeType === 'direct') {
-  formData.end = end;
-}
+    if (routeType === 'direct') {
+      formData.end = end;
+    }
 
-onGenerate(formData);
+    onGenerate(formData);
   }
 
   return (

@@ -1,55 +1,61 @@
 const request = require('supertest');
-const app = require('../../app'); // Express app
+const app = require('../../app');
 
-//Missing Distance Field
-it('should return 400 if start is missing', async () => {
-  const res = await request(app).post('/api/route').send({
-    distance: 2,
-    routeType: 'loop'
+describe('[E2E] /api/route (error cases)', () => {
+  it('should return 400 if start is missing', async () => {
+    const res = await request(app).post('/api/route').send({
+      routeType: 'direct',
+      end: { lat: 1.3521, lng: 103.8198 },
+      distance: 1
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'InvalidStartLocation');
+    expect(res.body.message).toMatch(/starting location/i);
   });
 
-  expect(res.status).toBe(400);
-  expect(res.body.message).toMatch(/starting location/i);
-});
+  it('should return 400 if direct route is missing end', async () => {
+    const res = await request(app).post('/api/route').send({
+      routeType: 'direct',
+      start: { lat: 1.3008, lng: 103.8725 },
+      distance: 1
+    });
 
-//Invalid routeType
-it('should return 400 if distance is negative', async () => {
-  const res = await request(app).post('/api/route').send({
-    start: { lat: 1.3, lng: 103.8 },
-    distance: -5,
-    routeType: 'loop'
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/end location is required/i);
   });
 
-  expect(res.status).toBe(400);
-  expect(res.body.message).toMatch(/positive number/i);
-});
+  it('should return 400 for non-existent start location (geocoding fails)', async () => {
+    const res = await request(app).post('/api/route').send({
+      routeType: 'loop',
+      start: 'asdlkjasdljkqweqwe', // gibberish string
+      distance: 1
+    });
 
-//Missing end point for direct route
-it('should return 400 if start.lat is not a number', async () => {
-  const res = await request(app).post('/api/route').send({
-    start: { lat: "not-a-number", lng: 103.8 },
-    distance: 2,
-    routeType: 'loop'
+    expect(res.statusCode).toBe(400);
+    expect(res.body.message).toMatch(/couldn't find.*start/i);
   });
 
-  expect(res.status).toBe(400);
-});
+  it('should return 400 for non-existent end location (geocoding fails)', async () => {
+    const res = await request(app).post('/api/route').send({
+      routeType: 'direct',
+      start: { lat: 1.354, lng: 103.821 },
+      end: 'qwueiqwueiqwueiqwe', // gibberish string
+      distance: 2
+    });
 
-jest.mock('../../utils/googleRequest', () => ({
-  getWalkingRoute: jest.fn(() => {
-    throw new Error("Google API error");
-  })
-}));
-
-//Malformed end point
-it('should return 500 if Google API fails', async () => {
-  const res = await request(app).post('/api/route').send({
-    start: { lat: 1.3, lng: 103.8 },
-    end: { lat: 1.305, lng: 103.805 },
-    distance: 1,
-    routeType: 'direct'
+    expect(res.statusCode).toBe(400);
+    expect(res.body.message).toMatch(/end location.*please try again/i);
   });
 
-  expect(res.status).toBe(500);
-  expect(res.body.message).toMatch(/Google API/i);
+  it('should return 400 for negative distance', async () => {
+    const res = await request(app).post('/api/route').send({
+      routeType: 'loop',
+      start: { lat: 1.3008, lng: 103.8725 },
+      distance: -5
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.message).toMatch(/distance must be.*positive/i);
+  });
 });
