@@ -21,9 +21,21 @@ const LoginForm = () =>  {
   const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Basic frontend validation
+    if (!email || !password) {
+      alert('Please enter both email and password.');
+      return;
+    }
+
+    // Basic email check
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
 
     try {
       const response =  await axios.post('http://localhost:4000/api/login', {

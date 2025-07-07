@@ -17,7 +17,18 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !password) {
+      alert('Please enter both email and password.');
+      return;
+    }
 
+    // Basic email check
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
     //Check if password matches
     if (confirmPassword !== password) {
       alert("Passwords do not match.");
