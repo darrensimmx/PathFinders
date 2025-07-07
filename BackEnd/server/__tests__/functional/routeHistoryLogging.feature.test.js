@@ -67,7 +67,7 @@ beforeEach(async () => {
 })
 
 //Add fn
-describe('Add Route function with Mocked Data', () => {
+describe('[UNIT] Add Route function with Mocked Data', () => {
 
   //Able to add a saved route and register on MongoDB
   it('should add a new saved route', async () => {
@@ -134,7 +134,7 @@ describe('Add Route function with Mocked Data', () => {
 })
 
 //Fetch routes fn
-describe('Fetch Route Fn with Mocked Data', () => {
+describe('[UNIT] Fetch Route Fn with Mocked Data', () => {
   it('should fetch saved routes', async () => {
     const route1 = {
       name: 'Route1',
@@ -165,7 +165,7 @@ describe('Fetch Route Fn with Mocked Data', () => {
 })
 
 //fetch single route fn
-describe('Fetch Single Route Based on Mocked Id', () => {
+describe('[UNIT] Fetch Single Route Based on Mocked Id', () => {
   //fetch succesfully if it exists
   it('should return the single route if exists', async () => {
     const newRoute = {
@@ -211,7 +211,7 @@ describe('Fetch Single Route Based on Mocked Id', () => {
 })
 
 //Delete route fn
-describe('Delete Route Fn with Mocked Data', () => {
+describe('[UNIT] Delete Route Fn with Mocked Data', () => {
   //Able to delete route from database
   it('should delete route from database', async () => {
     const route3 = {
@@ -281,7 +281,7 @@ beforeEach(async () => {
 });
 
 // Ensure that /api/routes/save, /api/routes and /api/route/:routeId works => e2e w express
-describe('HTML request to backend', () => {
+describe('[INTEGRATION] HTML request to backend', () => {
   // /api/routes/save
   it('should save a route', async () => {
     const newRoute = {
@@ -427,3 +427,86 @@ describe('HTML request to backend', () => {
   })
 
 })
+
+/************************************FUNCTIONAL TEST ************************************/
+describe('[FUNCTIONAL] Route Controller Functions with Real MongoMemory DB', () => {
+  it('adds a route and verifies it exists in DB', async () => {
+    const route = {
+      name: 'Functional Route',
+      distance: 3000,
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
+    };
+
+    const addedRouteId = await addSavedRoute(user._id, route); // ObjectId
+    const fetched = await SavedRoute.findOne({ _id: addedRouteId, user: user._id });
+    
+    expect(fetched).not.toBeNull();
+    expect(fetched.distance).toBe(3000);
+  });
+
+  it('fetches all saved routes for a user', async () => {
+    const routeA = {
+      name: 'A',
+      distance: 1000,
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
+    };
+    const routeB = { ...routeA, name: 'B' };
+
+    await addSavedRoute(user._id, routeA);
+    await addSavedRoute(user._id, routeB);
+
+    const result = await fetchSavedRoutes(user._id);
+    expect(result.length).toBe(2);
+    expect(result.map(r => r.name)).toContain('A');
+    expect(result.map(r => r.name)).toContain('B');
+  });
+
+  it('fetches a single route correctly', async () => {
+    const route = {
+      name: 'Functional Single',
+      distance: 2000,
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
+    };
+
+    const added = await addSavedRoute(user._id, route);
+    const result = await fetchSingleRoute(user._id, added._id);
+
+    expect(result.name).toBe('Functional Single');
+    expect(result.distance).toBe(2000);
+  });
+
+  it('removes a saved route from DB', async () => {
+    const route = {
+      name: 'To Be Deleted',
+      distance: 1000,
+      coordinates: [1, 2],
+      startPoint: { type: 'Point', coordinates: [3, 4] },
+      endPoint: { type: 'Point', coordinates: [5, 6] }
+    };
+
+    const added = await addSavedRoute(user._id, route);
+    await removeSavedRoute(user._id, added._id);
+
+    const exists = await SavedRoute.findById(added._id);
+    expect(exists).toBeNull();
+  });
+
+  it('throws error when deleting nonexistent route', async () => {
+    const fakeId = new mongoose.Types.ObjectId();
+    let error;
+    try {
+      await removeSavedRoute(user._id, fakeId);
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error).toBeDefined();
+    expect(error.message).toBe('Route not found');
+  });
+});

@@ -8,7 +8,7 @@ jest.mock('../../utils/routeTools', () => ({
   snapRectangleLoop: jest.fn()
 }));
 
-describe('generateLoopRoute', () => {
+describe('[UNIT] generateLoopRoute', () => {
   const start = { lat: 1.0, lng: 103.0 };
   const mockCorners = [
     { lat: 1.0001, lng: 103.0001 },

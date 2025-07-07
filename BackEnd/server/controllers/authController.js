@@ -8,6 +8,9 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { SECRET } = require('../config');
 
+//For forget password
+const nodemailer = require('nodemailer');
+
 async function signUp({name, email, password}) {
   //mongoose data
   if (!name || !email || !password) {
@@ -65,21 +68,41 @@ async function forgotPassword({ email }) {
     return { status: 'error', message: 'User not found' };
   }
 
-  // Generate secure token & expiry
   const token = crypto.randomBytes(32).toString('hex');
   user.resetPasswordToken = token;
   user.resetPasswordExpires = Date.now() + 1000 * 60 * 15; // 15 mins
-
   await user.save();
 
   const resetLink = `http://localhost:5173/reset-password?token=${token}`;
-  console.log(`Password reset link: ${resetLink}`);
 
-  return {
-    status: 'success',
-    message: 'Password reset link generated',
-    resetLink
+  // Set up transporter
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER, 
+      pass: process.env.GMAIL_PASS, 
+    }
+  });
+
+  const mailOptions = {
+    from: 'PathFinders <no-reply@pathfinders.com>',
+    to: email,
+    subject: 'Password Reset Request',
+    html: `
+      <p>Hello,</p>
+      <p>You requested a password reset. Click the link below to reset your password:</p>
+      <a href="${resetLink}">${resetLink}</a>
+      <p>This link will expire in 15 minutes.</p>
+    `
   };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { status: 'success', message: 'Password reset link sent to email' };
+  } catch (err) {
+    console.error('Email error:', err);
+    return { status: 'error', message: 'Failed to send email' };
+  }
 }
 
 // Mocked fn with mock data

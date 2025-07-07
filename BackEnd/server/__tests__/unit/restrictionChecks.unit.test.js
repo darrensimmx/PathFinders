@@ -36,7 +36,7 @@ beforeAll(() => {
   });
 });
 
-describe('isPointInRestrictedArea', () => {
+describe('[UNIT] isPointInRestrictedArea', () => {
   it('returns true for point inside restricted zone', () => {
     const result = isPointInRestrictedArea({ lat: 1.29, lng: 103.82 });
     expect(result).toBe(true);
@@ -48,7 +48,7 @@ describe('isPointInRestrictedArea', () => {
   });
 });
 
-describe('isRouteInRestrictedArea', () => {
+describe('[UNIT] isRouteInRestrictedArea', () => {
   it('returns true if any point is in restricted zone', () => {
     const route = [
       [103.90, 1.35], // outside

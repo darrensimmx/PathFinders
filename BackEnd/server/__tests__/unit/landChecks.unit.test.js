@@ -30,7 +30,7 @@ fs.readFileSync.mockImplementation(() =>
 // Re-require the module AFTER the mocks are set up
 const {isOnLand} = require('../../utils/landChecks')
 
-describe('isOnLand (with mock GeoJSON)', () => {
+describe('[UNIT] isOnLand (with mock GeoJSON)', () => {
   it('should return true for a point inside the land polygon', () => {
     const result = isOnLand(1.29, 103.82, mockLandGeoJSON);
     expect(result).toBe(true);

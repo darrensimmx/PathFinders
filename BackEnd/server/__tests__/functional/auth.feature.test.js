@@ -16,7 +16,7 @@ const app = require('../../app');
 /****************************************Unit Testing****************************************/
 
 // Login button renders and works 
-describe('Login with mocked data', () => {
+describe('[Unit] Login with mocked data', () => {
   //return success if email & pw match mocked data
   it('should return success if email and password match mock data', async () => {
     const result = await loginMock({
@@ -63,7 +63,7 @@ describe('Login with mocked data', () => {
 })
 
 // Sign up fn 
-describe('Signed up with mocked data', () => {
+describe('[Unit] Signed up with mocked data', () => {
   // Sign up returns success if valid username and password
   it('should return success if valid username and password', async () => {
     const result = await signUpMock({
@@ -135,7 +135,7 @@ afterEach(async () => {
 })
 
 // Fill email, password and submit to see expected behavior in Mongoose
-describe('Auth API Integration', () => {
+describe('[Integration] Auth API Integration', () => {
 
   //email and password should store in db when entered correctly
   it('should register a new user successfully', async () => {
@@ -291,7 +291,7 @@ describe('Auth API Integration', () => {
 
 
 
-describe('remember me flow', () => {
+describe('[Functional] remember me flow', () => {
   // issue refresh token cookie when checked
   it('should issue refreshToken cookie when rememberMe is true', async () => {
     await request(app)
@@ -380,8 +380,8 @@ describe('remember me flow', () => {
   });
 })
 
-// Authentication feature
-test('should access protected route with valid accessToken', async () => {
+// Authentication featureh
+test('[Functional] should access protected route with valid accessToken', async () => {
   // Ensure test@example.com exists
   await request(app)
     .post('/api/signup')
