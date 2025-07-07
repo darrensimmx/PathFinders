@@ -6,7 +6,7 @@ import Sidebar from './Layout/Sidebar';
 import RouteMap from '../RouteMap';
 import WeatherAlertPopup from './WeatherAlertPopUp';
 import './Layout/Layout.css';
-import { geocode } from '../../utils/geocode';
+import { geocodePlace } from '../../utils/geocode';
 
 export default function MainApp() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -135,8 +135,8 @@ export default function MainApp() {
     setPopupVisible(false);
 
     try {
-      const start = await geocode(formData.start);
-      const end = formData.routeType !== 'loop' ? await geocode(formData.end) : null;
+      const start = await geocodePlace(formData.start);
+      const end = formData.routeType !== 'loop' ? await geocodePlace(formData.end) : null;
 
       const payload = {
         start,
