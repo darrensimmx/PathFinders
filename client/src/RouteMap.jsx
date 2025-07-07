@@ -5,6 +5,7 @@ import {
   Marker,
   Polyline,
   Popup,
+  Tooltip,
   useMapEvents
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -45,6 +46,9 @@ export default function RouteMap({
       <MapContainer
         center={center}
         zoom={13}
+        // slow zoom increments: half-step for controls, double px needed per wheel level
+        zoomDelta={0.5}
+        wheelPxPerZoomLevel={120}
         scrollWheelZoom={true}
         style={{ width: '100%', height: '100%', position: 'relative' }}
       >
@@ -74,51 +78,68 @@ export default function RouteMap({
             {(() => {
               if (!samplesEvery2km?.length) {
                 return (
-                  <Polyline
-                    positions={routeCoords}
-                    pathOptions={{ color: 'blue', weight: 4 }}
-                  />
+                  <Polyline positions={routeCoords} pathOptions={{ color: 'blue', weight: 4 }}>
+                    <Tooltip sticky direction="auto">Section 1</Tooltip>
+                  </Polyline>
                 );
               }
 
-              // Build break indices
-              const breakIdx = samplesEvery2km
-                .map(pt =>
-                  routeCoords.findIndex(
-                    ([lat, lng]) => lat === pt.lat && lng === pt.lng
-                  )
-                )
-                .filter(i => i >= 0);
-
-              const cutPoints = [
-                0,
-                ...breakIdx.map(i => i + 1),
-                routeCoords.length
-              ];
-
+              // 10 distinct non-warm colors for normal segments
               const goodCols = [
-                '#2ECC71',
-                '#3498DB',
-                '#F1C40F',
-                '#9B59B6',
-                '#E67E22'
+                '#2ECC71', // green
+                '#3498DB', // light blue
+                '#9B59B6', // purple
+                '#1ABC9C', // turquoise
+                '#34495E', // dark slate
+                '#27AE60', // dark green
+                '#8E44AD', // dark purple
+                '#2980B9', // dark blue
+                '#16A085', // teal
+                '#7F8C8D'  // gray
               ];
-
-              return cutPoints.slice(0, -1).map((start, i) => {
-                const end = cutPoints[i + 1];
-                const segment = routeCoords.slice(start, end);
-                const hasBad =
-                  weatherWarnings?.[i]?.badHours?.length > 0;
-                const color = hasBad ? 'red' : goodCols[i % goodCols.length];
-
-                return (
-                  <Polyline
-                    key={i}
-                    positions={segment}
-                    pathOptions={{ color, weight: 4 }}
-                  />
-                );
+              // 10 much darker red shades for clear visibility
+              const redShades = ['#CC0000','#B30000','#990000','#800000','#660000','#4D0000','#330000','#1A0000','#110000','#080000'];
+               // Build break indices by nearest-match to avoid precision mismatches
+              const breakIdx = samplesEvery2km.map(pt => {
+                let bestIdx = 0;
+                let bestDist = Infinity;
+                routeCoords.forEach(([lat, lng], idx) => {
+                  const d = Math.hypot(lat - pt.lat, lng - pt.lng);
+                  if (d < bestDist) { bestDist = d; bestIdx = idx; }
+                });
+                return bestIdx;
               });
+              // Remove duplicates and sort
+              const uniqueIdx = [...new Set(breakIdx)].sort((a, b) => a - b);
+              // Define segment boundaries (include last point index)
+              const cutPoints = [0, ...uniqueIdx, routeCoords.length - 1];
+
+              return cutPoints.map((start, i) => {
+                const end = cutPoints[i + 1];
+                if (end == null) return null;
+                const segment = routeCoords.slice(start, end + 1);
+                const hasBad = weatherWarnings?.[i]?.badHours?.length > 0;
+                // alternate red shades from ends inward: 1->0, 2->9, 3->1, 4->8, etc.
+                let color;
+                if (hasBad) {
+                  const idx = i;
+                  // alternate shades: 1st(light), 2nd(dark), 3rd(2nd light), 4th(2nd dark), etc., then wrap
+                  const half = redShades.length / 2;
+                  let shadeIndex;
+                  if (idx % 2 === 0) shadeIndex = idx / 2;
+                  else shadeIndex = half + Math.floor((idx - 1) / 2);
+                  // wrap index if exceeds available shades
+                  shadeIndex = shadeIndex % redShades.length;
+                  color = redShades[shadeIndex];
+                } else {
+                  color = goodCols[i % goodCols.length];
+                }
+                return (
+                  <Polyline key={i} positions={segment} pathOptions={{ color, weight: 4 }}>
+                    <Tooltip sticky direction="auto">Section {i + 1}</Tooltip>
+                  </Polyline>
+                );
+              }).filter(Boolean);
             })()}
           </>
         )}
