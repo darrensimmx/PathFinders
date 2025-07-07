@@ -26,7 +26,18 @@ async function signUp({name, email, password}) {
   const hashedPassword = await bcrypt.hash(password, salt) //use bcrypt to hash
   const newUser = new User({name, email, password: hashedPassword});
   await newUser.save(); // save to mongodb
-  return { status: 'success'}
+  const accessToken = jwt.sign({ id: newUser._id }, SECRET, { expiresIn: '1h' });
+
+  // Return token along with user info
+  return {
+    status: 'success',
+    accessToken,
+    user: {
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email
+    }
+  }
 }
 
 async function login({ email, password, rememberMe}) {
