@@ -10,7 +10,7 @@ export default function RouteForm({ onGenerate }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log("📤 Form submitted with:", { start, end, distance, routeType });
+    console.log("Form submitted with:", { start, end, distance, routeType });
 
 
     if (!start || !distance) {

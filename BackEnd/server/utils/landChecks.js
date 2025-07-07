@@ -5,14 +5,22 @@ const turf = require('@turf/turf');
 const fs = require('fs');
 const path = require('path');
 
-const landGeoJSON = JSON.parse(
-  //got from official website the land geojson data to cross check to
-  fs.readFileSync(path.join(__dirname, '../data/sgland.geojson'))
-);
+let landGeoJSON;
 
-function isOnLand(lat, lng) {
+try {
+  landGeoJSON = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '../data/sgland.geojson'))
+  );
+} catch (err) {
+  landGeoJSON = null; // for test override
+}
+
+function isOnLand(lat, lng, geoJSONOverride = null) { // for testing we add another param, set to null on actual usage
+  const geo = geoJSONOverride || landGeoJSON;
+  if (!geo) throw new Error('GeoJSON data not loaded');
+
   const pt = turf.point([lng, lat]);
-  return turf.booleanPointInPolygon(pt, landGeoJSON);
+  return turf.booleanPointInPolygon(pt, geo);
 }
 
 module.exports = { isOnLand };

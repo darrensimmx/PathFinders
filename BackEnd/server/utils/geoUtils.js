@@ -5,8 +5,14 @@
 // WGS-84 standard for radius approximations
 function metreToDeg(m, lat) {
   const latConv = 111132.92 - 559.82 * Math.cos(2 * lat * Math.PI / 180);
-  const lngConv = 111412.84 * Math.cos(lat * Math.PI / 180);
-  return { dLat: m / latConv, dLng: m / lngConv };
+  const cosLat = Math.cos(lat * Math.PI / 180);
+  const lngConv = 111412.84 * cosLat;
+
+  // Prevent divide by zero at the poles
+  return {
+    dLat: m / latConv,
+    dLng: Math.abs(cosLat) < 1e-10 ? 0 : m / lngConv
+  };
 }
 
 
