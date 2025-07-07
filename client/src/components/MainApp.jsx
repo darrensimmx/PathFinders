@@ -232,7 +232,12 @@ export default function MainApp() {
         />
 
         <main className="map-wrapper flex-1 relative">
-          <RouteMap sidebarOpen={isSidebarOpen} routeCoords={coords} />
+          <RouteMap
+            sidebarOpen={isSidebarOpen}
+            routeCoords={coords}
+            samplesEvery2km={samplesEvery2km}
+            weatherWarnings={weatherWarnings}
+          />
 
           {popupVisible && (
             <div className="absolute bottom-4 left-0 right-0 flex justify-center z-[9999] px-4">

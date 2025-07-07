@@ -32,23 +32,64 @@ export default function WeatherAlertPopup({
       {/* Body with scrollable warning list */}
       <div className="px-6 py-4 max-h-[25vh] overflow-y-auto">
         {hasWarnings ? (
-          <ul className="list-disc pl-5 space-y-1 text-gray-800 pr-2">
+          <ul className="list-none space-y-3">
             {weatherWarnings.map((warn, i) => {
               const idx = samplesEvery2km.findIndex(
                 pt => pt.lat === warn.lat && pt.lng === warn.lng
               );
               const section = idx >= 0 ? idx + 1 : i + 1;
               const items = warn.badHours || [];
+              // 10 much darker red shades for clear visibility
+              const redShades = ['#CC0000','#B30000','#990000','#800000','#660000','#4D0000','#330000','#1A0000','#110000','#080000'];
+              // choose shade based on section index
+              // alternating 1,6,2,7,3,8 indices in redShades array
+              let color;
+              if (items.length > 0) {
+                const secIdx = section - 1;
+                const half = redShades.length / 2;
+                // 1->0,2->5,3->1,4->6,... then wrap every 10
+                let shadeIdx = secIdx % redShades.length;
+                if (shadeIdx % 2 === 0) shadeIdx = shadeIdx / 2;
+                else shadeIdx = half + Math.floor((shadeIdx - 1) / 2);
+                shadeIdx = shadeIdx % redShades.length;
+                color = redShades[shadeIdx];
+              } else {
+                // 10 distinct non-warm colors for clear segments in popup
+                const goodCols = [
+                  '#2ECC71', // green
+                  '#3498DB', // light blue
+                  '#9B59B6', // purple
+                  '#1ABC9C', // turquoise
+                  '#34495E', // dark slate
+                  '#27AE60', // dark green
+                  '#8E44AD', // dark purple
+                  '#2980B9', // dark blue
+                  '#16A085', // teal
+                  '#7F8C8D'  // gray
+                ];
+                color = goodCols[(section - 1) % goodCols.length];
+              }
 
               return (
-                <li key={i}>
-                  <strong>Section {section}:</strong>{' '}
-                  {items.map((h, j) => (
-                    <span key={j}>
-                      {h.time} ({h.condition})
-                      {j < items.length - 1 ? ', ' : ''}
-                    </span>
-                  ))}
+                <li key={i} className="flex items-start space-x-2">
+                  <span
+                    style={{
+                      backgroundColor: color,
+                      width: 12,
+                      height: 12,
+                      borderRadius: '50%',
+                      marginTop: 4
+                    }}
+                  />
+                  <div className="text-gray-800">
+                    <strong style={{ color }}>Section {section}:</strong>{' '}
+                    {items.map((h, j) => (
+                      <span key={j}>
+                        {h.time} ({h.condition})
+                        {j < items.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                  </div>
                 </li>
               );
             })}

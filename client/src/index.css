@@ -2,6 +2,14 @@
 
 /* client/src/index.css */
 
+/* stylelint-disable */
+
+/* Override Leaflet interactive shapes to use default cursor */
+.leaflet-container .leaflet-interactive {
+  cursor: default !important;
+}
+
+/* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -58,4 +66,18 @@ html, body, #root {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Override Leaflet vector layers to default cursor */
+.leaflet-container svg path.leaflet-interactive,
+.leaflet-container svg path.leaflet-interactive:hover {
+  cursor: default !important;
+}
+
+/* Ensure map container always shows default pointer, except when actively dragging */
+.leaflet-container {
+  cursor: default !important;
+}
+.leaflet-container.leaflet-grabbing {
+  cursor: grabbing !important;
 }
