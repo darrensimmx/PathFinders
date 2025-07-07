@@ -109,7 +109,7 @@ async function forgotPassword({ email }) {
 
   try {
     await transporter.sendMail(mailOptions);
-    return { status: 'success', message: 'Password reset link sent to email' };
+    return { status: 'success', message: 'Password reset link sent to email', resetLink };
   } catch (err) {
     console.error('Email error:', err);
     return { status: 'error', message: 'Failed to send email' };
