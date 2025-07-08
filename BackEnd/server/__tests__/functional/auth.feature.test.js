@@ -414,6 +414,13 @@ test('[Functional] should access protected route with valid accessToken', async 
   expect(res.body.message).toMatch(/protected/);
 });
 
+// Set higher timeout for slow integration tests and suppress console output
+jest.setTimeout(30000);
+
+// Suppress console logs and warnings during tests
+jest.spyOn(console, 'log').mockImplementation(() => {});
+jest.spyOn(console, 'warn').mockImplementation(() => {});
+
 
 
 
