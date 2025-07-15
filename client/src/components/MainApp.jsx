@@ -24,6 +24,7 @@ export default function MainApp() {
   const [user, setUser] = useState(null);
   const [weatherWarnings, setWeatherWarnings] = useState([]);
   const [samplesEvery2km, setSamplesEvery2km] = useState([]);
+  const [waypointMarkers, setWaypointMarkers] = useState([]);
 
   const [lastGenerateArgs, setLastGenerateArgs] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
@@ -133,16 +134,32 @@ export default function MainApp() {
     setWeatherWarnings([]);
     setSamplesEvery2km([]);
     setPopupVisible(false);
+    setWaypointMarkers([]);
 
     try {
       const start = await geocodePlace(formData.start);
       const end = formData.routeType !== 'loop' ? await geocodePlace(formData.end) : null;
+      let waypointCoords = [];
+      if (formData.waypoints && Array.isArray(formData.waypoints)) {
+        // Geocode each waypoint address (postal codes included if geocoding supports)
+        const rawCoords = await Promise.all(
+          formData.waypoints.map(addr => geocodePlace(addr))
+        );
+        const validCoords = rawCoords.filter(c => c && typeof c.lat === 'number' && typeof c.lng === 'number');
+        if (validCoords.length < rawCoords.length) {
+          // notify user some waypoints failed to geocode
+          alert('Some waypoints could not be found and will be ignored.');
+        }
+        waypointCoords = validCoords;
+        setWaypointMarkers(validCoords.map(pt => [pt.lat, pt.lng]));
+      }
 
       const payload = {
         start,
         ...(end && { end }),
         distance: formData.distance,
         routeType: formData.routeType,
+        ...(waypointCoords.length > 0 && { waypoints: waypointCoords }),
         filters,
       };
 
@@ -237,6 +254,7 @@ export default function MainApp() {
             routeCoords={coords}
             samplesEvery2km={samplesEvery2km}
             weatherWarnings={weatherWarnings}
+            waypoints={waypointMarkers}
           />
 
           {popupVisible && (

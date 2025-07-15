@@ -5,10 +5,8 @@ const generateLoopRoute = require('../controllers/looproute');
 const generateDirectRoute = require('../controllers/directRoute');
 const { geocodePlace } = require('../utils/geoUtils');
 
-const {
-  sampleEvery2km,
-  getWeatherWarnings
-} = require('../utils/weatherCheck');
+const { sampleEvery2km, getWeatherWarnings } = require('../utils/weatherCheck');
+const { getWalkingRoute } = require('../utils/googleRequest'); // for waypoint routes
 
 // Utility: Normalize coordinates to [{ lat, lng }, …]
 function extractRouteCoords(result) {
@@ -24,7 +22,30 @@ function extractRouteCoords(result) {
 
 // POST /api/route
 router.post('/', async (req, res) => {
-  const { start, end, distance, routeType } = req.body;
+  const { start, end, distance, routeType, waypoints } = req.body;
+
+  // Validate provided waypoints if any
+  let validWaypoints = [];
+  if (Array.isArray(waypoints) && waypoints.length > 0) {
+    waypoints.forEach((pt, idx) => {
+      if (!pt || typeof pt.lat !== 'number' || typeof pt.lng !== 'number') {
+        return res.status(400).json({
+          success: false,
+          error: 'InvalidWaypoint',
+          message: `Waypoint at index ${idx} is invalid.`
+        });
+      }
+      // check coordinate range
+      if (pt.lat < -90 || pt.lat > 90 || pt.lng < -180 || pt.lng > 180) {
+        return res.status(400).json({
+          success: false,
+          error: 'InvalidWaypoint',
+          message: `Waypoint at index ${idx} has out-of-range coordinates.`
+        });
+      }
+    });
+    validWaypoints = waypoints;
+  }
 
   const isFallbackCBD = coords =>
     coords.lat === 1.3521 && coords.lng === 103.8198;
@@ -65,14 +86,9 @@ router.post('/', async (req, res) => {
       });
     }
 
-    console.log('[Route Debug] routeType received:', routeType);
-    let result;
+    // Parse End for non-loop routes
     let endCoords;
-
-    // Generate Route
-    if (routeType === 'loop') {
-      result = await generateLoopRoute(startCoords, distNum);
-    } else {
+    if (routeType !== 'loop') {
       if (!end) {
         return res.status(400).json({
           success: false,
@@ -80,13 +96,11 @@ router.post('/', async (req, res) => {
           message: "End location is required for direct routes."
         });
       }
-
       if (typeof end === 'string') {
         endCoords = await geocodePlace(end);
       } else if (typeof end === 'object' && end !== null) {
         endCoords = end;
       }
-
       if (
         !endCoords ||
         typeof endCoords.lat !== 'number' ||
@@ -96,15 +110,47 @@ router.post('/', async (req, res) => {
         const rawInput = typeof end === 'string'
           ? end
           : (end?.lat || end?.lng ? JSON.stringify(end) : 'an unknown location');
-
         return res.status(400).json({
           success: false,
           error: "InvalidEndLocation",
           message: `We couldn't locate the end location: "${rawInput}". Please try again.`
         });
       }
+    }
 
-      result = await generateDirectRoute(startCoords, endCoords, distNum);
+    console.log('[Route Debug] routeType received:', routeType);
+    let result;
+    if (routeType !== 'loop') {
+      // Build stops: start -> waypoints (if any) -> end
+      const stops = [startCoords, ...(validWaypoints || []), endCoords];
+      let allCoords = [];
+      let totalDist = 0;
+      // Chain shortest segments between each stop
+      for (let i = 0; i < stops.length - 1; i++) {
+        const seg = await getWalkingRoute(stops[i], stops[i + 1]);
+        if (!seg || !seg.coords) throw new Error(`Failed routing segment ${i + 1}`);
+        if (i === 0) allCoords = [...seg.coords];
+        else allCoords.push(...seg.coords.slice(1));
+        totalDist += seg.dist;
+      }
+      const targetM = distNum * 1000;
+      if (totalDist < targetM) {
+        // Extend with loop at final stop for remaining distance
+        const remKm = (targetM - totalDist) / 1000;
+        const loopExt = await generateLoopRoute(stops[stops.length - 1], remKm);
+        if (!loopExt || !loopExt.geojson?.coordinates) throw new Error('Failed loop extension');
+        // LoopExt coords is [lng,lat] array
+        allCoords.push(...loopExt.geojson.coordinates.slice(1));
+        totalDist += loopExt.actualDist;
+      }
+      result = {
+        type: 'direct-with-loop',
+        geojson: { type: 'LineString', coordinates: allCoords },
+        actualDist: totalDist
+      };
+    } else {
+      // Loop-only route
+      result = await generateLoopRoute(startCoords, distNum);
     }
 
     console.log('RAW CONTROLLER RESULT:', JSON.stringify(result, null, 2));
