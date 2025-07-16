@@ -1,6 +1,8 @@
 // routeGeneration Feature
 //utils/geoUtils.js to store fns for geographic distance calculator
 
+const axios = require('axios');
+
 // Convert metres to degrees latitude/longitude at a given latitude, formula is derived from 
 // WGS-84 standard for radius approximations
 function metreToDeg(m, lat) {
