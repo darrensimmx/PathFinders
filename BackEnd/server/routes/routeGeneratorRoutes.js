@@ -248,7 +248,7 @@ router.post('/', async (req, res) => {
         if (!loopExt || !loopExt.geojson?.coordinates) throw new Error('Failed loop extension');
         // LoopExt coords is [lng,lat] array
         allCoords.push(...loopExt.geojson.coordinates.slice(1));
-        totalDist += loopExt.actualDist * 1000; // Convert back to meters
+        totalDist += loopExt.actualDist; // actualDist is already in meters
       }
       
       result = {
