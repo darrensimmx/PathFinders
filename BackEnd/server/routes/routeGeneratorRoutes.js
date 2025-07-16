@@ -202,7 +202,6 @@ router.post('/', async (req, res) => {
       }
     }
 
-    console.log('[Route Debug] routeType received:', routeType);
     let result;
     if (routeType !== 'loop') {
       // Build stops: start -> waypoints (if any) -> end
@@ -260,8 +259,6 @@ router.post('/', async (req, res) => {
       // Loop-only route
       result = await generateLoopRoute(startCoords, distNum);
     }
-
-    console.log('RAW CONTROLLER RESULT:', JSON.stringify(result, null, 2));
 
     //Extract Coordinates
     let routeCoords;
