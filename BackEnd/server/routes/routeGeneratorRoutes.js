@@ -3,7 +3,7 @@ const router = express.Router();
 
 const generateLoopRoute = require('../controllers/looproute');
 const generateDirectRoute = require('../controllers/directRoute');
-const { geocodePlace } = require('../utils/geoUtils');
+const { geocodePlace, haversineDistance } = require('../utils/geoUtils');
 
 const { sampleEvery2km, getWeatherWarnings } = require('../utils/weatherCheck');
 const { getWalkingRoute } = require('../utils/googleRequest'); // for waypoint routes
@@ -26,27 +26,24 @@ router.post('/', async (req, res) => {
 
   // Validate provided waypoints if any
   let validWaypoints = [];
+  const sgBounds = { minLat: 1.13, maxLat: 1.45, minLng: 103.6, maxLng: 104.1 };
   if (Array.isArray(waypoints) && waypoints.length > 0) {
     waypoints.forEach((pt, idx) => {
       if (!pt || typeof pt.lat !== 'number' || typeof pt.lng !== 'number') {
-        return res.status(400).json({
-          success: false,
-          error: 'InvalidWaypoint',
-          message: `Waypoint at index ${idx} is invalid.`
-        });
+        return res.status(400).json({ success: false, error: 'InvalidWaypoint', message: `Waypoint at index ${idx} is invalid.` });
       }
       // check coordinate range
       if (pt.lat < -90 || pt.lat > 90 || pt.lng < -180 || pt.lng > 180) {
-        return res.status(400).json({
-          success: false,
-          error: 'InvalidWaypoint',
-          message: `Waypoint at index ${idx} has out-of-range coordinates.`
-        });
+        return res.status(400).json({ success: false, error: 'InvalidWaypoint', message: `Waypoint at index ${idx} has out-of-range coordinates.` });
+      }
+      // check within Singapore boundary
+      if (pt.lat < sgBounds.minLat || pt.lat > sgBounds.maxLat || pt.lng < sgBounds.minLng || pt.lng > sgBounds.maxLng) {
+        return res.status(400).json({ success: false, error: 'OutsideBoundary', message: `Waypoint at index ${idx} is outside Singapore boundary.` });
       }
     });
     validWaypoints = waypoints;
   }
-
+  
   const isFallbackCBD = coords =>
     coords.lat === 1.3521 && coords.lng === 103.8198;
 
@@ -54,6 +51,7 @@ router.post('/', async (req, res) => {
     // Parse Start
     let startCoords;
     if (typeof start === 'string') {
+      // Geocode start (including postal codes handled in geocodePlace)
       startCoords = await geocodePlace(start);
     } else if (typeof start === 'object' && start !== null) {
       startCoords = start;
@@ -89,6 +87,7 @@ router.post('/', async (req, res) => {
     // Parse End for non-loop routes
     let endCoords;
     if (routeType !== 'loop') {
+      // require end
       if (!end) {
         return res.status(400).json({
           success: false,
@@ -96,11 +95,13 @@ router.post('/', async (req, res) => {
           message: "End location is required for direct routes."
         });
       }
+      // geocode or use provided coords
       if (typeof end === 'string') {
         endCoords = await geocodePlace(end);
       } else if (typeof end === 'object' && end !== null) {
         endCoords = end;
       }
+      // validate end coords
       if (
         !endCoords ||
         typeof endCoords.lat !== 'number' ||
@@ -134,12 +135,11 @@ router.post('/', async (req, res) => {
         totalDist += seg.dist;
       }
       const targetM = distNum * 1000;
+      // If under target, extend with loop at final stop; if over, keep full route to ensure waypoints are covered
       if (totalDist < targetM) {
-        // Extend with loop at final stop for remaining distance
         const remKm = (targetM - totalDist) / 1000;
         const loopExt = await generateLoopRoute(stops[stops.length - 1], remKm);
         if (!loopExt || !loopExt.geojson?.coordinates) throw new Error('Failed loop extension');
-        // LoopExt coords is [lng,lat] array
         allCoords.push(...loopExt.geojson.coordinates.slice(1));
         totalDist += loopExt.actualDist;
       }
@@ -149,8 +149,36 @@ router.post('/', async (req, res) => {
         actualDist: totalDist
       };
     } else {
-      // Loop-only route
-      result = await generateLoopRoute(startCoords, distNum);
+      // Loop route with optional waypoints: start -> waypoints -> start
+      if (validWaypoints.length > 0) {
+        const loopStops = [startCoords, ...validWaypoints, startCoords];
+        let allCoords = [];
+        let totalDistLoop = 0;
+        for (let i = 0; i < loopStops.length - 1; i++) {
+          const seg = await getWalkingRoute(loopStops[i], loopStops[i + 1]);
+          if (!seg || !seg.coords) throw new Error(`Failed loop segment ${i + 1}`);
+          if (i === 0) allCoords = [...seg.coords];
+          else allCoords.push(...seg.coords.slice(1));
+          totalDistLoop += seg.dist;
+        }
+        // Extend loop if under target distance
+        const targetM = distNum * 1000;
+        if (totalDistLoop < targetM) {
+          const remKm = (targetM - totalDistLoop) / 1000;
+          const ext = await generateLoopRoute(startCoords, remKm);
+          if (!ext || !ext.geojson?.coordinates) throw new Error('Failed loop extension');
+          allCoords.push(...ext.geojson.coordinates.slice(1));
+          totalDistLoop += ext.actualDist;
+        }
+        result = {
+          type: 'loop-with-waypoints',
+          geojson: { type: 'LineString', coordinates: allCoords },
+          actualDist: totalDistLoop
+        };
+      } else {
+        // Loop-only route
+        result = await generateLoopRoute(startCoords, distNum);
+      }
     }
 
     console.log('RAW CONTROLLER RESULT:', JSON.stringify(result, null, 2));
@@ -174,6 +202,22 @@ router.post('/', async (req, res) => {
         error: "InsufficientCoords",
         message: 'Route has too few coordinates to sample.'
       });
+    }
+
+    // Enforce Singapore boundary
+    if (Array.isArray(routeCoords)) {
+      const bounds = { minLat: 1.13, maxLat: 1.45, minLng: 103.6, maxLng: 104.1 };
+      const outside = routeCoords.some(pt =>
+        pt.lat < bounds.minLat || pt.lat > bounds.maxLat ||
+        pt.lng < bounds.minLng || pt.lng > bounds.maxLng
+      );
+      if (outside) {
+        return res.status(400).json({
+          success: false,
+          error: 'OutsideBoundary',
+          message: 'Route leaves Singapore boundary.'
+        });
+      }
     }
 
     //Sample & Weather 
