@@ -26,8 +26,8 @@ try {
   // Install route-related packages
   run("npm install --prefix BackEnd/server @mapbox/polyline @turf/turf node-fetch@2 axios");
 
-  console.log("\n✅ Setup complete!");
+  console.log("\n Setup complete!");
 } catch (error) {
-  console.error("\n❌ Setup failed:", error.message);
+  console.error("\n Setup failed:", error.message);
   process.exit(1);
 }
