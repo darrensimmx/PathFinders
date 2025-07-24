@@ -56,6 +56,10 @@ router.post('/', async (req, res) => {
     } else if (typeof start === 'object' && start !== null) {
       startCoords = start;
     }
+    // ensure start within Singapore
+    if (startCoords && (startCoords.lat < sgBounds.minLat || startCoords.lat > sgBounds.maxLat || startCoords.lng < sgBounds.minLng || startCoords.lng > sgBounds.maxLng)) {
+      return res.status(400).json({ success: false, error: 'OutsideBoundary', message: 'Start location outside Singapore boundary.' });
+    }
 
     if (
       !startCoords ||
@@ -87,7 +91,7 @@ router.post('/', async (req, res) => {
     // Parse End for non-loop routes
     let endCoords;
     if (routeType !== 'loop') {
-      // require end
+      // check end given stays in Singapore
       if (!end) {
         return res.status(400).json({
           success: false,
@@ -95,13 +99,15 @@ router.post('/', async (req, res) => {
           message: "End location is required for direct routes."
         });
       }
-      // geocode or use provided coords
       if (typeof end === 'string') {
+        // Geocode end (including postal codes handled in geocodePlace)
         endCoords = await geocodePlace(end);
       } else if (typeof end === 'object' && end !== null) {
         endCoords = end;
       }
-      // validate end coords
+      if (endCoords && (endCoords.lat < sgBounds.minLat || endCoords.lat > sgBounds.maxLat || endCoords.lng < sgBounds.minLng || endCoords.lng > sgBounds.maxLng)) {
+        return res.status(400).json({ success: false, error: 'OutsideBoundary', message: 'End location outside Singapore boundary.' });
+      }
       if (
         !endCoords ||
         typeof endCoords.lat !== 'number' ||

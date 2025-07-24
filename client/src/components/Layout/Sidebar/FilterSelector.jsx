@@ -1,122 +1,95 @@
 import React, { useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import FilterRadioGroup from './FilterRadioGroup';
 
-export default function FilterSelector({
-  selectedFilters,
-  setSelectedFilters
-}) {
+export default function FilterSelector({ selectedFilters, setSelectedFilters }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [terrain, setTerrain] = useState('');
-  const [elevation, setElevation] = useState('');
-  const [landmarkSearch, setLandmarkSearch] = useState('');
+  const [waypoints, setWaypoints] = useState([]);
+  const [waypointInput, setWaypointInput] = useState('');
 
-  const toggleOpen = () => setIsOpen(!isOpen);
+  const toggleOpen = () => setIsOpen(prev => !prev);
 
-  const handleApply = () => {
-    const newFilters = [];
-    if (terrain) newFilters.push(`Terrain: ${terrain}`);
-    if (elevation) newFilters.push(`Elevation: ${elevation}`);
-    if (landmarkSearch) newFilters.push(`Landmark: ${landmarkSearch}`);
-
-     setSelectedFilters(prev => {
-      const merged = [...prev];
-      newFilters.forEach(item => {
-      if (!merged.includes(item)) {
-        merged.push(item);
-      }
-    });
-    return merged;
-  });
-    //Clear form each time we submit
-    setTerrain('');
-    setElevation('');
-    setLandmarkSearch('');
-    setIsOpen(false);
+  const handleAddWaypoint = () => {
+    if (waypointInput.trim()) {
+      const newWp = waypointInput.trim();
+      setWaypoints(prev => [...prev, newWp]);
+      setWaypointInput('');
+      setSelectedFilters(prev => [...prev, `Waypoint: ${newWp}`]);
+    }
   };
 
-  const handleRemove = (item) => {
-    setSelectedFilters(prev => {
-      const idx = prev.indexOf(item);
-      if (idx !== -1) {
-        const copy = [...prev];
-        copy.splice(idx, 1);
-        return copy;
-      }
-      return prev;
-  });
+  const handleRemoveWaypoint = idx => {
+    const removed = waypoints[idx];
+    setWaypoints(prev => prev.filter((_, i) => i !== idx));
+    setSelectedFilters(prev => prev.filter(item => item !== `Waypoint: ${removed}`));
+  };
 
-};
-
+  const handleRemoveTag = tag => {
+    if (tag.startsWith('Waypoint: ')) {
+      const wp = tag.replace('Waypoint: ', '');
+      setWaypoints(prev => prev.filter(w => w !== wp));
+    }
+    setSelectedFilters(prev => prev.filter(item => item !== tag));
+  };
 
   return (
-    <div className="mt-4">
-      {/* Toggle */}
+    <div className="mt-4 relative">
       <button
         type="button"
         onClick={toggleOpen}
-        className="
-          w-full px-4 py-2
-          bg-[#302b63] text-white font-semibold
-          rounded flex justify-between items-center
-        "
+        className="w-full px-4 py-2 bg-gray-800 text-white font-semibold rounded flex justify-between items-center"
       >
         Filter Preference
         {isOpen ? <FaChevronUp /> : <FaChevronDown />}
       </button>
 
-      {/* Panel */}
       {isOpen && (
-        <div className="bg-gray-100 text-gray-800 p-4 mt-2 rounded space-y-4">
-          <FilterRadioGroup
-            label="Terrain Type"
-            options={['Pavement', 'Trail', 'Mixed']}
-            name="terrain"
-            value={terrain}
-            onChange={setTerrain}
-          />
-
-          <FilterRadioGroup
-            label="Elevation"
-            options={['Low', 'Medium', 'High']}
-            name="elevation"
-            value={elevation}
-            onChange={setElevation}
-          />
-
-          {/* Landmark */}
-          <div>
-            <h4 className="font-medium mb-1">Landmarks</h4>
+        <div className="absolute w-full mt-1 bg-gray-300 bg-opacity-75 p-4 rounded shadow-lg">
+          <h4 className="font-medium mb-2">Waypoints (optional)</h4>
+          <div className="flex items-center mb-2">
             <input
               type="text"
-              value={landmarkSearch}
-              onChange={e => setLandmarkSearch(e.target.value)}
-              placeholder="Search"
-              className="w-full px-3 py-2 border rounded"
+              value={waypointInput}
+              onChange={e => setWaypointInput(e.target.value)}
+              placeholder="Enter waypoint address"
+              className="w-3/4 px-3 py-2 border rounded"
             />
+            <button
+              type="button"
+              onClick={handleAddWaypoint}
+              className="ml-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded text-white"
+            >
+              Add
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={handleApply}
-            className="w-full py-2 bg-[#302b63] text-white font-semibold rounded"
-          >
-            Apply Filters
-          </button>
+          {waypoints.length > 0 && (
+            <ul className="list-disc list-inside text-sm max-h-32 overflow-auto">
+              {waypoints.map((wp, idx) => (
+                <li key={idx} className="flex justify-between items-center mb-1">
+                  <span>{wp}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveWaypoint(idx)}
+                    className="text-red-500 hover:text-red-700 ml-2"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
-      {/* Applied Tags */}
       <div className="flex flex-wrap mt-2 gap-2">
-        {selectedFilters.map(item => (
+        {selectedFilters.map(tag => (
           <span
-            key={item}
-            className="bg-red-500 text-white px-3 py-1 rounded flex items-center"
+            key={tag}
+            className="bg-blue-500 text-white px-3 py-1 rounded flex items-center"
           >
-            {item}
+            {tag}
             <button
               type="button"
-              onClick={() => handleRemove(item)}
+              onClick={() => handleRemoveTag(tag)}
               className="ml-2 font-bold"
             >
               ✕
