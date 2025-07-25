@@ -45,6 +45,7 @@ const LoginForm = () =>  {
       console.log(response.data.status)
       if (response.data.status === 'success') {
         localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
         navigate('/route-generator');
       } else {
         alert(response.data.message); // show alert on frontpage

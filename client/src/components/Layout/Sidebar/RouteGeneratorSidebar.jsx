@@ -33,6 +33,7 @@ export default function RouteGeneratorSidebar({
         subtitle="Route Generator"
         onBack={() => setActiveView('navigation')}
         user={user}
+        username={user?.username || user?.name}
       />
 
       <RouteForm onGenerate={onFormSubmit} />

@@ -65,7 +65,19 @@ async function login({ email, password, rememberMe}) {
     refreshToken = jwt.sign({id: user._id}, SECRET, {expiresIn: '7d'});
   }
 
-  return { status: 'success', accessToken, refreshToken };
+  return {
+    status: 'success',
+    accessToken,
+    refreshToken,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      bio: user.bio,
+      profileImage: user.profileImage
+    }
+  };
 }
 
 //Forget Password

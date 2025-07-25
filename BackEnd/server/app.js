@@ -6,6 +6,7 @@ const cors    = require('cors');
 const routeGeneratorRouter = require('./routes/routeGeneratorRoutes')
 const savedRoutes = require('./routes/savedRoutesRoutes')
 const authRoutes = require('./routes/authRoutes')
+const userRoutes = require('./routes/userRoutes')
 const cookieParser = require('cookie-parser'); // jwt helper
 const protectedRoutes = require('./routes/protectedRoutes')
 
@@ -16,7 +17,11 @@ if (!ORS_KEY) {
 }
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: 'http://127.0.0.1:5173',
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser())
 
@@ -28,6 +33,7 @@ app.use(cookieParser())
 // Route to login/signup page defined in authRoutes
 app.use('/api', authRoutes);
 app.use('/api', protectedRoutes);
+app.use('/api', userRoutes)
 app.use('/api/saved-routes', savedRoutes)
 
 // Unified route handler (direct and loop)

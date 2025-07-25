@@ -2,11 +2,15 @@
 // defines MongoDB User schema 
 const mongoose = require('mongoose');
 
-//TODO: update with more fields as we progress the features
 const userSchema = new mongoose.Schema({
   name: {
     type: String, 
     required: true
+  },
+  username: {
+    type: String,
+    unique: true,
+    sparse: true
   },
   email: {
     type: String, 
@@ -17,6 +21,14 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  bio: {
+    type: String,
+    default: ''
+  },
+  profileImage: {
+    type: String, 
+    default: ''
   },
   resetPasswordToken: String, 
   resetPasswordExpires: Date,

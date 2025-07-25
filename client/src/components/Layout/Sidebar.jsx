@@ -62,11 +62,12 @@ function Sidebar({
           currentGeneratedRoute={currentGeneratedRoute}
           samplesEvery2km={samplesEvery2km}
           weatherWarnings={weatherWarnings}
+          user={user}
         />
       )}
 
       {activeView === 'contact' && (
-        <ContactUsSidebar setActiveView={setActiveView} />
+        <ContactUsSidebar setActiveView={setActiveView} user={user}/>
       )}
     </aside>
   );
