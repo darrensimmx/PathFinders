@@ -18,6 +18,7 @@ function SavedRoutesSidebar({ setActiveView, routes, onClearAll, onDeleteRoute, 
         subtitle="Saved Routes"
         onBack={() => setActiveView('navigation')}
         user={user}
+        username={user?.username || user?.name}
       />
       <h4>Saved Routes (Up to 5!)</h4>
 

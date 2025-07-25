@@ -49,14 +49,16 @@ const GOOGLE_KEY = process.env.GOOGLE_API_KEY;
 
 async function geocodePlace(placeName) {
   try {
+    // Use components filter for Singapore postal codes
+    const params = { key: GOOGLE_KEY };
+    if (/^\d{6}$/.test(placeName)) {
+      params.components = `postal_code:${placeName}|country:SG`;
+    } else {
+      params.address = placeName;
+    }
     const res = await axios.get(
       'https://maps.googleapis.com/maps/api/geocode/json',
-      {
-        params: {
-          address: placeName,
-          key: GOOGLE_KEY
-        }
-      }
+      { params }
     );
 
     if (

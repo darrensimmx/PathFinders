@@ -9,6 +9,7 @@ export default function NavigationSidebar({ setActiveView, user }) {
         subtitle="Menu"
         user={user}
         // onBack={() => setActiveView('routeGenerator')}
+        username={user?.username || user?.name}
       />
 
       <hr />

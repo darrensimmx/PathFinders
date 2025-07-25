@@ -18,29 +18,34 @@ async function getWalkingRoute(origin, destination, waypoints = []) {
       key: GOOGLE_KEY
     };
 
-    //if there are waypoints, change the waypoints to usable form of lat and lng
-    //console.log(waypoints.length)
-    if (waypoints.length) {
-      params.waypoints = waypoints.map(p => `${p.lat},${p.lng}`).join('|');
+    // include waypoints as stopovers in given order, disabling optimization
+    if (Array.isArray(waypoints) && waypoints.length) {
+      const stops = waypoints.map(p => `${p.lat},${p.lng}`).join('|');
+      params.waypoints = `optimize:false|${stops}`;
     }
 
-    const response = await axios.get('https://maps.googleapis.com/maps/api/directions/json', { params });
+    // debug: show final params (remove in production)
+    console.log('getWalkingRoute params:', params);
 
-    // if no routes, then throw error to show API error
-    //console.log(response.data.routes.length)
+    const response = await axios.get(
+      'https://maps.googleapis.com/maps/api/directions/json',
+      { params }
+    );
+
+    // console.log('Google routes returned:', response.data.routes.length);
+
     if (!response.data.routes.length) {
       throw new Error('No route returned from Google');
     }
-      
 
     const route = response.data.routes[0];
-    //console.log(route)
-    const coords = polyline.decode(route.overview_polyline.points).map(([lat, lng]) => [lng, lat]); //change coords order to make it work, not sure why lat and lng swapped in the first place
-    const dist = route.legs.reduce((sum, leg) => sum + leg.distance.value, 0); //accumulate distances over an array
+    const coords = polyline.decode(route.overview_polyline.points)
+      .map(([lat, lng]) => [lng, lat]);
+    const dist = route.legs.reduce((sum, leg) => sum + leg.distance.value, 0);
 
     return { coords, dist };
   } catch (err) {
-    console.error('getWalkingRoute error:', err.message); //debug
+    console.error('getWalkingRoute error:', err.message);
     return null;
   }
 }

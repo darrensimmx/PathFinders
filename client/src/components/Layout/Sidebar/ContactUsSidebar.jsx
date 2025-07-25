@@ -2,13 +2,14 @@ import React from 'react';
 import SidebarHeader from './SidebarHeader';
 import { FaEnvelope } from 'react-icons/fa';
 
-export default function ContactUsSidebar({ setActiveView }) {
+export default function ContactUsSidebar({ setActiveView, user, username }) {
   return (
     <div className="p-4 text-white flex flex-col h-full">
       <SidebarHeader 
         title="Contact Us"
         subtitle=""
         onBack={() => setActiveView('navigation')}
+        username={user?.username || user?.name}
       />
 
       <div className="mt-4">

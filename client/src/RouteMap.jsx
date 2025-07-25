@@ -15,7 +15,8 @@ export default function RouteMap({
   routeCoords,
   samplesEvery2km,
   weatherWarnings,
-  sidebarOpen
+  sidebarOpen,
+  waypoints = []
 }) {
   const center = routeCoords?.[0] || [1.3521, 103.8198];
   const [clickPos, setClickPos] = useState(null);
@@ -68,6 +69,13 @@ export default function RouteMap({
             </Popup>
           </Marker>
         )}
+
+        {/* Render waypoint markers */}
+        {waypoints.map((pos, idx) => (
+          <Marker key={`wp-${idx}`} position={pos}>
+            <Popup>Waypoint {idx + 1}</Popup>
+          </Marker>
+        ))}
 
         {routeCoords && (
           <>

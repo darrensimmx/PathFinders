@@ -8,11 +8,12 @@ export default function RouteForm({ onGenerate }) {
   const [end, setEnd] = useState('');
   const [distance, setDistance] = useState('');
   const [routeType, setRouteType] = useState('loop'); // default to loop
+  const [waypoints, setWaypoints] = useState([]);
+  const [waypointInput, setWaypointInput] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
     console.log("Form submitted with:", { start, end, distance, routeType });
-
 
     if (!start || !distance) {
       alert("Start and distance are required.");
@@ -49,8 +50,21 @@ export default function RouteForm({ onGenerate }) {
     if (routeType === 'direct') {
       formData.end = end;
     }
+    if (waypoints.length) {
+      formData.waypoints = waypoints;
+    }
 
     onGenerate(formData);
+  }
+
+  function handleAddWaypoint() {
+    if (waypointInput.trim()) {
+      setWaypoints(prev => [...prev, waypointInput.trim()]);
+      setWaypointInput('');
+    }
+  }
+  function handleRemoveWaypoint(idx) {
+    setWaypoints(prev => prev.filter((_, i) => i !== idx));
   }
 
   return (
@@ -114,6 +128,44 @@ export default function RouteForm({ onGenerate }) {
             Point-to-point
           </button>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-white mb-1">
+          Waypoints (optional)
+        </label>
+        <div className="flex space-x-2 mb-2">
+          <input
+            type="text"
+            value={waypointInput}
+            onChange={e => setWaypointInput(e.target.value)}
+            placeholder="Enter waypoint address"
+            className="w-full px-3 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400"
+          />
+          <button
+            type="button"
+            onClick={handleAddWaypoint}
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-md text-white"
+          >
+            Add
+          </button>
+        </div>
+        {waypoints.length > 0 && (
+          <ul className="list-disc list-inside text-sm text-white max-h-32 overflow-auto">
+            {waypoints.map((wp, idx) => (
+              <li key={idx} className="flex justify-between items-center">
+                <span>{wp}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveWaypoint(idx)}
+                  className="text-red-400 hover:text-red-600 ml-2"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <button
