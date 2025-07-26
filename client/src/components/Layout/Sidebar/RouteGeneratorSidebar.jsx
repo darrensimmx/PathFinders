@@ -34,11 +34,7 @@ export default function RouteGeneratorSidebar({
     };
 
   return (
-    <div
-      className="h-full w-full overflow-y-auto"
-      style={{ scrollbarGutter: 'stable both-edges' }}
-    >
-      <div className="pt-4 pb-4 pl-4 pr-0 text-white flex flex-col h-full w-full">
+    <div className="p-4 text-white flex flex-col h-full w-full">
       <SidebarHeader
         subtitle="Route Generator"
         onBack={() => setActiveView('navigation')}
@@ -82,7 +78,6 @@ export default function RouteGeneratorSidebar({
         <p className="text-sm text-gray-300">
           For technical help or blocked routes, feedbacks are always welcome!
         </p>
-      </div>
       </div>
     </div>
   );
