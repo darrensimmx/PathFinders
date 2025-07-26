@@ -4,7 +4,12 @@
     "scripts": {
         "dev:backend": "npm --prefix BackEnd/server run dev",
         "dev:frontend": "npm --prefix client           run dev",
-        "start": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "build:frontend": "npm --prefix client run build",
+        "build:backend": "echo \"No backend build step\"",
+        "build": "npm run build:frontend",
+        "start:backend": "npm --prefix BackEnd/server run start",
+        "start:frontend": "npm --prefix client run preview -- --port 5173",
+        "start": "npx concurrently \"npm run start:backend\" \"npm run start:frontend\"",
         "setup": "node scripts/setup.js"
     },
     "devDependencies": {
