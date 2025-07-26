@@ -1,18 +1,41 @@
 import React, { useState } from 'react';
 import SidebarHeader from './SidebarHeader';
 import { FaEnvelope } from 'react-icons/fa';
+import html2canvas from 'html2canvas';
 
 export default function ContactUsSidebar({ setActiveView, user, username }) {
   const [contactType, setContactType] = useState('general');
+  const [routeName, setRouteName] = useState('');
   const [generalMsg, setGeneralMsg] = useState('');
   const [routePts, setRoutePts] = useState([]);
-  const sendFeedback = () => {
-    const email = 'support@pathfinders.com';
-    if (contactType === 'general') {
-      window.location.href = `mailto:${email}?subject=General Feedback&body=${encodeURIComponent(generalMsg)}`;
-    } else {
-      const body = routePts.map(pt => `${pt.lat},${pt.lng}`).join('\n');
-      window.location.href = `mailto:${email}?subject=Route Feedback&body=${encodeURIComponent(body)}`;
+  const sendFeedback = async () => {
+    try {
+      if (contactType === 'route') {
+        // Capture map screenshot, copy to clipboard, then open mailto so user can paste in email
+        const mapEl = document.querySelector('.leaflet-container') || document.querySelector('.map-wrapper');
+        const canvas = await html2canvas(mapEl);
+        // Convert canvas to blob
+        const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+        // Copy image to clipboard for user to paste
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          alert('Screenshot copied to clipboard. You can paste it in your email.');
+        } catch (e) {
+          // fallback ignored
+        }
+        const pointsText = routePts.map((pt, idx) =>
+          `Point ${idx + 1}: ${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}`
+        ).join('\n');
+        const body = `Route: ${routeName}\nPoints:\n${pointsText}`;
+        const mailto = `mailto:support@pathfinders.com?subject=${encodeURIComponent('Route Feedback')}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailto;
+      } else {
+        const mailto = `mailto:support@pathfinders.com?subject=${encodeURIComponent('General Feedback')}&body=${encodeURIComponent(generalMsg)}`;
+        window.location.href = mailto;
+      }
+    } catch (e) {
+      console.error('Feedback error', e);
+      alert('Failed to open email client.');
     }
   };
   return (
@@ -57,8 +80,8 @@ export default function ContactUsSidebar({ setActiveView, user, username }) {
             <label className="block text-sm font-medium mb-1">Route Name / Location</label>
             <input
               type="text"
-              value={generalMsg}
-              onChange={e => setGeneralMsg(e.target.value)}
+              value={routeName}
+              onChange={e => setRouteName(e.target.value)}
               placeholder=""
               className="w-full p-2 bg-gray-800 text-white rounded"
             />
@@ -79,7 +102,7 @@ export default function ContactUsSidebar({ setActiveView, user, username }) {
           onClick={sendFeedback}
           className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
         >
-          Send Feedback via Email
+          Send Feedback
         </button>
         <p className="text-xs text-gray-300">
           Note: Screenshots can be attached manually in your email.
