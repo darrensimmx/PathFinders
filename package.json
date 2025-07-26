@@ -10,7 +10,8 @@
         "start:backend": "npm --prefix BackEnd/server run start",
         "start:frontend": "npm --prefix client run preview -- --port 5173",
         "start": "npx concurrently \"npm run start:backend\" \"npm run start:frontend\"",
-        "setup": "node scripts/setup.js"
+        "setup": "node scripts/setup.js",
+        "postinstall": "npm install --prefix client && npm install --prefix BackEnd/server"
     },
     "devDependencies": {
         "concurrently": "^7.6.0",
