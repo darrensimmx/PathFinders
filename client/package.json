@@ -7,20 +7,21 @@
     "test": "jest",
     "dev": "vite dev",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "serve -s dist -l 5173"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.30.1",
-    "vite": "^6.3.5",
-    "@vitejs/plugin-react": "^4.0.0"
+    "serve": "^14.2.4",
+    "vite": "^4.4.9"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.27.2",
