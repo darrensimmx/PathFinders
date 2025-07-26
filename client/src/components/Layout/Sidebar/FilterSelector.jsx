@@ -43,7 +43,7 @@ export default function FilterSelector({ selectedFilters, setSelectedFilters }) 
       </button>
 
       {isOpen && (
-        <div className="absolute w-full mt-1 bg-gray-300 bg-opacity-75 p-4 rounded shadow-lg">
+        <div className="w-full mt-1 bg-gray-300 bg-opacity-75 p-4 rounded shadow-lg">
           <h4 className="font-medium mb-2">Waypoints (optional)</h4>
           <div className="flex items-center mb-2">
             <input
@@ -51,7 +51,7 @@ export default function FilterSelector({ selectedFilters, setSelectedFilters }) 
               value={waypointInput}
               onChange={e => setWaypointInput(e.target.value)}
               placeholder="Enter waypoint address"
-              className="w-3/4 px-3 py-2 border rounded"
+              className="w-3/4 px-3 py-2 border rounded bg-white text-black"
             />
             <button
               type="button"
@@ -79,24 +79,6 @@ export default function FilterSelector({ selectedFilters, setSelectedFilters }) 
           )}
         </div>
       )}
-
-      <div className="flex flex-wrap mt-2 gap-2">
-        {selectedFilters.map(tag => (
-          <span
-            key={tag}
-            className="bg-blue-500 text-white px-3 py-1 rounded flex items-center"
-          >
-            {tag}
-            <button
-              type="button"
-              onClick={() => handleRemoveTag(tag)}
-              className="ml-2 font-bold"
-            >
-              ✕
-            </button>
-          </span>
-        ))}
-      </div>
     </div>
   );
 }

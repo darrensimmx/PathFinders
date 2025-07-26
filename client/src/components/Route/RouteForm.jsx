@@ -1,15 +1,13 @@
 // client/src/components/Route/RouteForm.jsx
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import FormInput from '../Auth/FormInput';
 import { geocodePlace } from '../../../utils/geocode';
 
-export default function RouteForm({ onGenerate }) {
+const RouteForm = forwardRef(function RouteForm({ onGenerate }, ref) {
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [distance, setDistance] = useState('');
   const [routeType, setRouteType] = useState('loop'); // default to loop
-  const [waypoints, setWaypoints] = useState([]);
-  const [waypointInput, setWaypointInput] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -50,25 +48,13 @@ export default function RouteForm({ onGenerate }) {
     if (routeType === 'direct') {
       formData.end = end;
     }
-    if (waypoints.length) {
-      formData.waypoints = waypoints;
-    }
 
     onGenerate(formData);
   }
 
-  function handleAddWaypoint() {
-    if (waypointInput.trim()) {
-      setWaypoints(prev => [...prev, waypointInput.trim()]);
-      setWaypointInput('');
-    }
-  }
-  function handleRemoveWaypoint(idx) {
-    setWaypoints(prev => prev.filter((_, i) => i !== idx));
-  }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+    <form ref={ref} onSubmit={handleSubmit} className="flex flex-col space-y-4">
       <FormInput
         label="Starting Point"
         id="start"
@@ -130,61 +116,10 @@ export default function RouteForm({ onGenerate }) {
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-white mb-1">
-          Waypoints (optional)
-        </label>
-        <div className="flex space-x-2 mb-2">
-          <input
-            type="text"
-            value={waypointInput}
-            onChange={e => setWaypointInput(e.target.value)}
-            placeholder="Enter waypoint address"
-            className="w-full px-3 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400"
-          />
-          <button
-            type="button"
-            onClick={handleAddWaypoint}
-            className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-md text-white"
-          >
-            Add
-          </button>
-        </div>
-        {waypoints.length > 0 && (
-          <ul className="list-disc list-inside text-sm text-white max-h-32 overflow-auto">
-            {waypoints.map((wp, idx) => (
-              <li key={idx} className="flex justify-between items-center">
-                <span>{wp}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveWaypoint(idx)}
-                  className="text-red-400 hover:text-red-600 ml-2"
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <button
-        type="submit"
-        className="
-          mt-4
-          inline-flex
-          justify-center
-          py-2 px-4
-          border border-transparent
-          rounded-md
-          shadow-sm
-          text-base font-medium
-          text-white
-          bg-blue-600 hover:bg-blue-700
-        "
-      >
-        Generate Route
-      </button>
+      {/* Submit button hidden; sidebar renders Generate Route */}
+      <button type="submit" className="hidden">Generate Route</button>
     </form>
   );
-}
+});
+
+export default RouteForm;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import SidebarHeader from './SidebarHeader';
 import RouteForm from '../../Route/RouteForm';
 import FilterSelector from './FilterSelector';
@@ -21,14 +21,24 @@ export default function RouteGeneratorSidebar({
 }) {
   const [filters, setFilters] = useState([]);
   const availableFilters = ['Elevation 15%', 'GBTB', 'No Traffic Light'];
+  const formRef = useRef();
 
-  const onFormSubmit = (formData) => {
-    console.log("Form submitted from RouteGeneratorSidebar:", formData, filters);
-    handleGenerate(formData, filters);
-  };
+    const onFormSubmit = (formData) => {
+      // Separate waypoint tags from other filters
+      const waypointTags = filters.filter(tag => tag.startsWith('Waypoint: '));
+      const waypoints = waypointTags.map(tag => tag.replace('Waypoint: ', ''));
+      const normalFilters = filters.filter(tag => !tag.startsWith('Waypoint: '));
+      console.log("Generating with:", formData, { waypoints, filters: normalFilters });
+      // Pass waypoints inside formData for backend geocoding, and normal filters separately
+      handleGenerate({ ...formData, waypoints }, normalFilters);
+    };
 
   return (
-    <div className="p-4 text-white flex flex-col h-full w-full">
+    <div
+      className="h-full w-full overflow-y-auto"
+      style={{ scrollbarGutter: 'stable both-edges' }}
+    >
+      <div className="pt-4 pb-4 pl-4 pr-0 text-white flex flex-col h-full w-full">
       <SidebarHeader
         subtitle="Route Generator"
         onBack={() => setActiveView('navigation')}
@@ -36,13 +46,21 @@ export default function RouteGeneratorSidebar({
         username={user?.username || user?.name}
       />
 
-      <RouteForm onGenerate={onFormSubmit} />
+      <RouteForm onGenerate={onFormSubmit} ref={formRef} />
 
       <FilterSelector
         availableFilters={availableFilters}
         selectedFilters={filters}
         setSelectedFilters={setFilters}
       />
+      {/* Generate Route button moved below FilterSelector */}
+      <button
+        type="button"
+        onClick={() => formRef.current?.requestSubmit()}
+        className="mt-4 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
+      >
+        Generate Route
+      </button>
 
       <div className="mt-6">
         <RouteMessagePanel
@@ -64,6 +82,7 @@ export default function RouteGeneratorSidebar({
         <p className="text-sm text-gray-300">
           For technical help or blocked routes, feedbacks are always welcome!
         </p>
+      </div>
       </div>
     </div>
   );
