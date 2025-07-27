@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const upload = multer();
 const User = require('../models/userModel');
+const authenticateToken = require('../middleware/authMiddleware');
 
 router.patch('/users/:id', upload.single('profileImage'), async (req, res) => {
   console.log('PATCH /users/:id called with id =', req.params.id);
