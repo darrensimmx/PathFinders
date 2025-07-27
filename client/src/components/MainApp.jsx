@@ -1,6 +1,8 @@
 // client/src/components/MainApp.jsx
 
 import React, { useState, useEffect } from 'react';
+// load API base URL from env (empty string for same-origin)
+const API_URL = import.meta.env.VITE_API_URL || '';
 import Header from './Layout/Header';
 import Sidebar from './Layout/Sidebar';
 import RouteMap from '../RouteMap';
@@ -35,7 +37,7 @@ export default function MainApp() {
   useEffect(() => {
     const fetchSavedRoutes = async () => {
       try {
-        const res = await fetch('/api/saved-routes', {
+        const res = await fetch(`${API_URL}/api/saved-routes`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (!res.ok) throw new Error(await res.text());
@@ -52,7 +54,7 @@ export default function MainApp() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch('/api/me', {
+        const res = await fetch(`${API_URL}/api/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (!res.ok) throw new Error(await res.text());
@@ -67,7 +69,7 @@ export default function MainApp() {
 
   async function handleSaveRoute(route) {
     try {
-      const res = await fetch('/api/saved-routes/save', {
+      const res = await fetch(`${API_URL}/api/saved-routes/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +101,7 @@ export default function MainApp() {
 
   async function handleDeleteRoute(routeId) {
     try {
-      const res = await fetch(`/api/saved-routes/${routeId}`, {
+      const res = await fetch(`${API_URL}/api/saved-routes/${routeId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -112,7 +114,7 @@ export default function MainApp() {
 
   async function handleClearAllRoutes() {
     try {
-      const res = await fetch('/api/saved-routes/clear-all', {
+      const res = await fetch(`${API_URL}/api/saved-routes/clear-all`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -163,7 +165,7 @@ export default function MainApp() {
         filters,
       };
 
-      const res = await fetch('http://localhost:4000/api/route', {
+      const res = await fetch(`${API_URL}/api/route`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../../LoginForm.css';
 import axios from 'axios';
-// load API base URL from env
-const API_URL = import.meta.env.VITE_API_URL;
+// load API base URL from env, fallback to current origin
+const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 import { FaUser } from "react-icons/fa";
 import { RiMailAddFill } from "react-icons/ri";
 import InputBox from '../Common/InputBox';
