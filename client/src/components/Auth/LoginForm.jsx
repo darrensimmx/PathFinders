@@ -50,8 +50,9 @@ const LoginForm = () =>  {
         localStorage.setItem('user', JSON.stringify(response.data.user));
         navigate('/route-generator');
       } else {
-        alert(response.data.message); // show alert on frontpage
-      } 
+        // fallback text if message undefined
+        alert(response.data.message || 'Login failed');
+      }
     }
     catch (error) {
       console.log(error)
