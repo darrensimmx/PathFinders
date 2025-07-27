@@ -44,7 +44,7 @@ router.get('/users/:id', async (req, res) => {
 
 router.get('/me', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id); // assuming req.user is set by the auth middleware
+    const user = await User.findById(req.user.id).select('-password'); // assuming req.user is set by the auth middleware
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {
