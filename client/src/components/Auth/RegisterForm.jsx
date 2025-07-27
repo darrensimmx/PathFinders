@@ -35,7 +35,7 @@ const RegisterForm = () => {
       return;
     }
     try {
-      const response = await axios.post('http://localhost:4000/api/signup', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/signup`, {
         name, 
         email,
         password
