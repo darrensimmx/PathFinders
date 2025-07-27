@@ -36,7 +36,7 @@ export default function ProfileSidebar({ setActiveView }) {
     if (!userId) return;
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
           credentials: 'include',
         });
         const data = await res.json();
@@ -65,7 +65,7 @@ export default function ProfileSidebar({ setActiveView }) {
 
      try {
       console.log('Parsed user ID:', userId);
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
         method: 'PATCH',
         body: formData,
         credentials: 'include',
