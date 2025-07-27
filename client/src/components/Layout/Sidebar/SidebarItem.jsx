@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function SidebarItem({ icon, title, subtitle, onClick }) {
   return (
     <div className="nav-item" onClick={onClick}>

@@ -1,3 +1,4 @@
+import React from 'react';
 import SidebarHeader from "./SidebarHeader";
 import SidebarItem from "./SidebarItem";
 import { FaUser, FaSave, FaPlayCircle, FaComments } from 'react-icons/fa'

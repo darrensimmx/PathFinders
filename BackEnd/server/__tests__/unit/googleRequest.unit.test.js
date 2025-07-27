@@ -186,7 +186,7 @@ describe('[UNIT] getWalkingRoute', () => {
       params: expect.objectContaining({
         origin: '1.3521,103.8198',
         destination: '1.354,103.821',
-        waypoints: '1.353,103.82|1.3535,103.8205',  // <-- This is the key part being tested
+        waypoints: 'optimize:false|1.353,103.82|1.3535,103.8205',  // <-- This is the key part being tested
         mode: 'walking',
         key: expect.any(String)
       })

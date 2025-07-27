@@ -1,5 +1,5 @@
 // Central base for all the pages
-
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginForm from './components/Auth/LoginForm'
 import RegisterForm from './components//Auth/RegisterForm'
