@@ -13,6 +13,7 @@ function App() {
         <Route path="/" element={<LoginForm />}/>
         <Route path="/register" element={<RegisterForm />}/>
         <Route path="/forgot-password" element={<ForgotPassword />}/>
+        <Route path="/test" element={<div style={{ color: 'white' }}>Hello from Test</div>} />
       </Routes>
   )
 }
