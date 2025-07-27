@@ -1,5 +1,5 @@
 //For Route Generated text and save icon
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { FaBookmark } from 'react-icons/fa'
 
 export default function RouteMessagePanel({ message, distance, loading, error, success, onSave, currentGeneratedRoute }) {
