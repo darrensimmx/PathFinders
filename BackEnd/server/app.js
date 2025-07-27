@@ -17,8 +17,20 @@ if (!ORS_KEY) {
 }
 
 const app = express();
+const allowedOrigins = [
+  'http://127.0.0.1:5173',
+  'https://pathfinders-frontend.onrender.com'
+];
+
 const corsOptions = {
-  origin: 'http://127.0.0.1:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 };
 app.use(cors(corsOptions));
