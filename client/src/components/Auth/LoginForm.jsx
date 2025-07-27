@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../LoginForm.css'
 //Link to backend
-import axios from 'axios'
+import axios from 'axios';
+// load API base URL from env
+const API_URL = import.meta.env.VITE_API_URL;
 
 //icons for login
 import { FaUser } from "react-icons/fa";
@@ -38,7 +40,7 @@ const LoginForm = () =>  {
     }
 
     try {
-      const response =  await axios.post('http://localhost:4000/api/login', {
+      const response =  await axios.post(`${API_URL}/api/login`, {
         email,
         password
       });
