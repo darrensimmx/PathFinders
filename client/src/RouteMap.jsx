@@ -29,7 +29,7 @@ export default function RouteMap({
         setClickPos([lat, lng]);
         try {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+            `${import.meta.env.VITE_API_URL}/api/reverse-geocode?lat=${lat}&lon=${lng}`
           );
           const data = await res.json();
           const { postcode, road } = data.address || {};

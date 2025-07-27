@@ -9,6 +9,7 @@ const authRoutes = require('./routes/authRoutes')
 const userRoutes = require('./routes/userRoutes')
 const cookieParser = require('cookie-parser'); // jwt helper
 const protectedRoutes = require('./routes/protectedRoutes')
+const geocodeRoutes = require('./routes/geocodeRoutes');
 
 const ORS_KEY = process.env.ORS_API_KEY;
 if (!ORS_KEY) {
@@ -47,6 +48,30 @@ app.use('/api', authRoutes);
 app.use('/api', protectedRoutes);
 app.use('/api', userRoutes)
 app.use('/api/saved-routes', savedRoutes)
+app.use('/api', geocodeRoutes);
+
+
+app.get('/api/reverse-geocode', async (req, res) => {
+  const { lat, lon } = req.query;
+
+  try {
+    const nominatimRes = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+      params: {
+        format: 'json',
+        lat,
+        lon
+      },
+      headers: {
+        'User-Agent': 'PathFindersApp/1.0 (orbitalpathfinders@gmail.com)'
+      }
+    });
+
+    res.json(nominatimRes.data);
+  } catch (err) {
+    console.error('Reverse Geocode Error:', err.message);
+    res.status(500).json({ error: 'Reverse geocoding failed' });
+  }
+});
 
 // Unified route handler (direct and loop)
 app.use('/api/route', routeGeneratorRouter);

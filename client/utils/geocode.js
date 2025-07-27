@@ -1,12 +1,10 @@
 export async function geocodePlace(placeName) {
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`
-  );
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/geocode?q=${encodeURIComponent(placeName)}`);
   const data = await res.json();
-  if (data.length === 0) return null;
+  if (data.error) return null;
 
   return {
-    lat: parseFloat(data[0].lat),
-    lng: parseFloat(data[0].lon),
+    lat: data.lat,
+    lng: data.lng,
   };
 }
