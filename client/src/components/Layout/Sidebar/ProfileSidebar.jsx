@@ -3,6 +3,8 @@ import BackBtn from '../../Assets/BackBtn.png'
 import Avatar from '../../Assets/Avatar.png'
 import SidebarHeader from './SidebarHeader';
 import { useState, useEffect } from 'react';
+// load API base URL from env, fallback to current origin
+const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
 export default function ProfileSidebar({ setActiveView }) {
   const [userId, setUserId] = useState(null);
@@ -36,7 +38,7 @@ export default function ProfileSidebar({ setActiveView }) {
     if (!userId) return;
     const fetchUser = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/users/${userId}`, {
+        const res = await fetch(`${API_URL}/api/users/${userId}`, {
           credentials: 'include',
         });
         const data = await res.json();
@@ -65,7 +67,7 @@ export default function ProfileSidebar({ setActiveView }) {
 
      try {
       console.log('Parsed user ID:', userId);
-      const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
+      const response = await fetch(`${API_URL}/api/users/${userId}`, {
         method: 'PATCH',
         body: formData,
         credentials: 'include',

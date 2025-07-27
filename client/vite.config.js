@@ -6,11 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // any request starting with /api will be forwarded to http://localhost:4000
+      // any request starting with /api will be forwarded to the API server
       '/api': {
-        target:      'http://localhost:4000',
+        // use VITE_API_URL or fall back to localhost
+        target: process.env.VITE_API_URL || 'http://localhost:4000',
         changeOrigin: true,
-        secure:       false,
+        secure: false,
       },
     },
   },

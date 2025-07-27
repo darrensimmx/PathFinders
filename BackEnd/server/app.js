@@ -17,8 +17,10 @@ if (!ORS_KEY) {
 }
 
 const app = express();
+// Allow CORS from configured client URL or default to localhost dev
+const CLIENT_URL = process.env.CLIENT_URL || 'http://127.0.0.1:5173';
 const corsOptions = {
-  origin: 'http://127.0.0.1:5173',
+  origin: CLIENT_URL,
   credentials: true,
 };
 app.use(cors(corsOptions));

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../../LoginForm.css';
 import axios from 'axios';
 // load API base URL from env
@@ -89,7 +89,7 @@ const RegisterForm = () => {
           <button type="submit" className="bg-blue-600 text-white py-2 rounded">Register</button>
 
           <div className="register-link">
-            <p>Already have an account? <a href="/">Login</a></p>
+            <p>Already have an account? <Link to="/">Login</Link></p>
           </div>
         </form>
     </AuthWrapper>    

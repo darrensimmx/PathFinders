@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../../LoginForm.css'; // reuse same styling
 import axios from 'axios';
 // load API base URL from env
@@ -53,7 +53,7 @@ const ForgotPassword = () => {
           {message && <p style={{ marginTop: '10px' }}>{message}</p>}
 
           <div className="register-link">
-            <p>Remember your password? <a href="/">Back to Login</a></p>
+            <p>Remember your password? <Link to="/">Back to Login</Link></p>
           </div>
         </form>
       </div>
