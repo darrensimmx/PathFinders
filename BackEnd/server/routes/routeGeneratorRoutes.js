@@ -28,20 +28,20 @@ router.post('/', async (req, res) => {
   let validWaypoints = [];
   const sgBounds = { minLat: 1.13, maxLat: 1.45, minLng: 103.6, maxLng: 104.1 };
   if (Array.isArray(waypoints) && waypoints.length > 0) {
-    waypoints.forEach((pt, idx) => {
+    for (let idx = 0; idx < waypoints.length; idx++) {
+      const pt = waypoints[idx];
       if (!pt || typeof pt.lat !== 'number' || typeof pt.lng !== 'number') {
         return res.status(400).json({ success: false, error: 'InvalidWaypoint', message: `Waypoint at index ${idx} is invalid.` });
       }
-      // check coordinate range
       if (pt.lat < -90 || pt.lat > 90 || pt.lng < -180 || pt.lng > 180) {
         return res.status(400).json({ success: false, error: 'InvalidWaypoint', message: `Waypoint at index ${idx} has out-of-range coordinates.` });
       }
-      // check within Singapore boundary
       if (pt.lat < sgBounds.minLat || pt.lat > sgBounds.maxLat || pt.lng < sgBounds.minLng || pt.lng > sgBounds.maxLng) {
         return res.status(400).json({ success: false, error: 'OutsideBoundary', message: `Waypoint at index ${idx} is outside Singapore boundary.` });
       }
-    });
+    }
     validWaypoints = waypoints;
+
   }
   
   const isFallbackCBD = coords =>

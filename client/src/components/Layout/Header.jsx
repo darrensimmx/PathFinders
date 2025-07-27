@@ -1,6 +1,7 @@
 import { TiThMenu } from "react-icons/ti";
 import PathFinderIcon from '../Assets/PathFinder_icon.png';
 import { RiLogoutBoxFill } from "react-icons/ri"
+import React from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
