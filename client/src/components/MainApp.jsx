@@ -35,7 +35,7 @@ export default function MainApp() {
   useEffect(() => {
     const fetchSavedRoutes = async () => {
       try {
-        const res = await fetch('/api/saved-routes', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/saved-routes`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (!res.ok) throw new Error(await res.text());
@@ -52,7 +52,7 @@ export default function MainApp() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch('/api/me', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (!res.ok) throw new Error(await res.text());
@@ -67,7 +67,7 @@ export default function MainApp() {
 
   async function handleSaveRoute(route) {
     try {
-      const res = await fetch('/api/saved-routes/save', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/saved-routes/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export default function MainApp() {
 
   async function handleDeleteRoute(routeId) {
     try {
-      const res = await fetch(`/api/saved-routes/${routeId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/saved-routes/${routeId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -112,7 +112,7 @@ export default function MainApp() {
 
   async function handleClearAllRoutes() {
     try {
-      const res = await fetch('/api/saved-routes/clear-all', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/saved-routes/clear-all`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
       });
