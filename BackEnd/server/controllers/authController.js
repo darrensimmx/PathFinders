@@ -187,4 +187,25 @@ async function signUpMock({ email, password}) {
 
 module.exports = { loginMock, signUpMock, 
                     login, signUp,
-                  forgotPassword }
+                  forgotPassword,
+                  // Reset password using token
+                  async function resetPassword({ token, password }) {
+    if (!token || !password) {
+      return { status: 'error', message: 'Token and new password are required' };
+    }
+    // Find user by valid token
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+    if (!user) {
+      return { status: 'error', message: 'Invalid or expired reset token' };
+    }
+    // Hash and set new password
+    const salt = await bcrypt.genSalt();
+    user.password = await bcrypt.hash(password, salt);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+    return { status: 'success', message: 'Password has been reset' };
+  }
