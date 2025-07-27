@@ -96,7 +96,7 @@ async function forgotPassword({ email }) {
   user.resetPasswordExpires = Date.now() + 1000 * 60 * 15; // 15 mins
   await user.save();
 
-  const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
   // Set up transporter
   const transporter = nodemailer.createTransport({

@@ -42,9 +42,4 @@ app.use('/api/route', routeGeneratorRouter);
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'OK' }));
 
-
-// Start server => moved to Backend/server.js to deconflict
-// const PORT = process.env.PORT || 4000;
-// app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
-
 module.exports = app;
