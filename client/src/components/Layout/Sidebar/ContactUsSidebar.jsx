@@ -27,10 +27,10 @@ export default function ContactUsSidebar({ setActiveView, user, username }) {
           `Point ${idx + 1}: ${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}`
         ).join('\n');
         const body = `Route: ${routeName}\nPoints:\n${pointsText}`;
-        const mailto = `mailto:support@pathfinders.com?subject=${encodeURIComponent('Route Feedback')}&body=${encodeURIComponent(body)}`;
+        const mailto = `mailto:orbitalpathfinders@gmail.com?subject=${encodeURIComponent('Route Feedback')}&body=${encodeURIComponent(body)}`;
         window.location.href = mailto;
       } else {
-        const mailto = `mailto:support@pathfinders.com?subject=${encodeURIComponent('General Feedback')}&body=${encodeURIComponent(generalMsg)}`;
+        const mailto = `mailto:orbitalpathfinders@gmail.com?subject=${encodeURIComponent('General Feedback')}&body=${encodeURIComponent(generalMsg)}`;
         window.location.href = mailto;
       }
     } catch (e) {
