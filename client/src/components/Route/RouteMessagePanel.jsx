@@ -5,6 +5,11 @@ import { FaBookmark } from 'react-icons/fa'
 export default function RouteMessagePanel({ message, distance, loading, error, success, onSave, currentGeneratedRoute }) {
   const [saved, setSaved] = useState(false)
 
+  useEffect(() => {
+    // Reset saved status whenever a new route is generated
+    setSaved(false);
+  }, [currentGeneratedRoute]);
+
   return (
     <div className="mt-4 text-sm">
       {loading && (
