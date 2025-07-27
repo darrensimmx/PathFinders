@@ -1,6 +1,6 @@
 //Page for Login 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../../LoginForm.css'
 //Link to backend
 import axios from 'axios'
@@ -81,13 +81,13 @@ const LoginForm = () =>  {
 
           <div className="remember-forgot">
             <label><input type="checkbox" />Remember me</label>
-            <a href="/forgot-password">Forgot password?</a>
+            <Link to="/forgot-password">Forgot password?</Link>
           </div>
           
           <button type="submit" className="bg-blue-600 text-white py-2 rounded">Login</button>
 
           <div className="register-link">
-            <p>Don't have an account? <a href="/register">Register</a></p>
+            <p>Don't have an account? <Link to="/register">Register</Link></p>
           </div>
         </form>
     </AuthWrapper>   
