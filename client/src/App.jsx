@@ -5,6 +5,7 @@ import LoginForm from './components/Auth/LoginForm'
 import RegisterForm from './components//Auth/RegisterForm'
 import ForgotPassword from './components/Auth/ForgotPassword';
 import MainApp from './components/MainApp'
+import ResetPassword from './components/Auth/ResetPassword'
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
         <Route path="/" element={<LoginForm />}/>
         <Route path="/register" element={<RegisterForm />}/>
         <Route path="/forgot-password" element={<ForgotPassword />}/>
-        <Route path="/test" element={<div style={{ color: 'white' }}>Hello from Test</div>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
   )
 }
