@@ -4,15 +4,17 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginForm from './components/Auth/LoginForm'
 import RegisterForm from './components//Auth/RegisterForm'
 import ForgotPassword from './components/Auth/ForgotPassword';
+import ResetPassword from './components/Auth/ResetPassword';
 import MainApp from './components/MainApp'
 
 function App() {
   return (
       <Routes>
-        <Route path="/route-generator" element={<MainApp />}/>
-        <Route path="/" element={<LoginForm />}/>
-        <Route path="/register" element={<RegisterForm />}/>
-        <Route path="/forgot-password" element={<ForgotPassword />}/>
+        <Route path="/route-generator" element={<MainApp />} />
+        <Route path="/" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
   )
 }

@@ -98,7 +98,7 @@ async function forgotPassword({ email }) {
 
   // Build reset link using configured client URL
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-  const resetLink = `${clientUrl}/reset-password?token=${token}`;
+  const resetLink = `${clientUrl}/#/reset-password?token=${token}`;
 
   // Set up transporter
   const transporter = nodemailer.createTransport({
