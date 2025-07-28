@@ -38,7 +38,7 @@ export default function RouteMap({
         setClickPos([lat, lng]);
         try {
           const res = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/reverse-geocode?lat=${lat}&lon=${lng}`
+            `${import.meta.env.VITE_API_URL}/reverse-geocode?lat=${lat}&lon=${lng}`
           );
           const data = await res.json();
           const { postcode, road } = data.address || {};
