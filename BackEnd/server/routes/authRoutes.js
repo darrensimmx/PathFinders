@@ -1,9 +1,10 @@
 // For Authentication/login feature: routes for /signup and /login
 const express = require('express');
 const router = express.Router();
-const { login, signUp, forgotPassword } = require('../controllers/authController');
+const { login, signUp, forgotPassword, resetPassword } = require('../controllers/authController');
 const authenticateToken = require('../middleware/authMiddleware');
 
+router.post('/reset-password', resetPassword);
 
 router.post('/login', async (req, res) => {
   const { email, password, rememberMe } = req.body;

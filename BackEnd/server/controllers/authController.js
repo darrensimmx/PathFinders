@@ -183,6 +183,40 @@ async function signUpMock({ email, password}) {
   return { status: 'success' }
 }
 
+async function resetPassword(req, res) {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ status: 'error', message: 'Token and new password are required.' });
+  }
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }, // check token isn't expired
+    });
+
+    if (!user) {
+      return res.status(400).json({ status: 'error', message: 'Invalid or expired token.' });
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    return res.status(200).json({ status: 'success', message: 'Password reset successful. You may now log in.' });
+  } catch (error) {
+    console.error('Reset Password Error:', error);
+    return res.status(500).json({ status: 'error', message: 'Server error during password reset.' });
+  }
+}
+
+
 module.exports = { loginMock, signUpMock, 
                     login, signUp,
-                  forgotPassword }
+                  forgotPassword, resetPassword }
