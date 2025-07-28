@@ -10,6 +10,8 @@ import {
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import InvalidateMapSizeHandler from '../utils/useInvalidateMapSize';
+import waypointIconSrc from './components/Assets/waypointIcon.png';
+import L from 'leaflet';
 
 export default function RouteMap({
   routeCoords,
@@ -21,6 +23,13 @@ export default function RouteMap({
   const center = routeCoords?.[0] || [1.3521, 103.8198];
   const [clickPos, setClickPos] = useState(null);
   const [clickInfo, setClickInfo] = useState(null);
+
+  const customWaypointIcon = new L.Icon({
+    iconUrl: new URL(waypointIconSrc, import.meta.url).href, // this works in both dev + prod
+    iconSize: [30, 40],     // adjust as needed
+    iconAnchor: [15, 40],   // ensures the "tip" touches the map
+    popupAnchor: [0, -40],  // so the popup appears above the icon
+  });
 
   function ClickHandler() {
     useMapEvents({
@@ -72,7 +81,7 @@ export default function RouteMap({
 
         {/* Render waypoint markers */}
         {waypoints.map((pos, idx) => (
-          <Marker key={`wp-${idx}`} position={pos}>
+          <Marker key={`wp-${idx}`} position={pos} icon={customWaypointIcon}>
             <Popup>Waypoint {idx + 1}</Popup>
           </Marker>
         ))}
