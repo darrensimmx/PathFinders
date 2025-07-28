@@ -1,17 +1,25 @@
-// client/vite.config.js
 import { defineConfig } from 'vite';
-import react        from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  base: '/', // This ensures proper routing base in production
   server: {
     proxy: {
-      // any request starting with /api will be forwarded to http://localhost:4000
       '/api': {
-        target:      'http://localhost:4000',
+        target: 'http://localhost:4000',
         changeOrigin: true,
-        secure:       false,
+        secure: false,
       },
+    },
+  },
+  build: {
+    outDir: 'dist', // Optional: ensure dist is used correctly
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'), // optional: allows @/ imports
     },
   },
 });
