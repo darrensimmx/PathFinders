@@ -25,7 +25,7 @@ export default function RouteMap({
   const [clickInfo, setClickInfo] = useState(null);
 
   const customWaypointIcon = new L.Icon({
-    iconUrl: new URL(waypointIconSrc, import.meta.url).href, // this works in both dev + prod
+    iconUrl: waypointIconSrc, // this works in both dev + prod
     iconSize: [30, 40],     // adjust as needed
     iconAnchor: [15, 40],   // ensures the "tip" touches the map
     popupAnchor: [0, -40],  // so the popup appears above the icon
