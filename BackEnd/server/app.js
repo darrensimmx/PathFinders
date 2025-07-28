@@ -10,6 +10,7 @@ const userRoutes = require('./routes/userRoutes')
 const cookieParser = require('cookie-parser'); // jwt helper
 const protectedRoutes = require('./routes/protectedRoutes')
 const geocodeRoutes = require('./routes/geocodeRoutes');
+const axios = require('axios');
 
 const ORS_KEY = process.env.ORS_API_KEY;
 if (!ORS_KEY) {
