@@ -2,7 +2,7 @@ PathFinders 🏃‍♂️🌍
 
 Generate suitable running routes based on user preferences — customized to every individual.
 
-Try it out without setup: 👉 PathFinders Web App
+Try it out without setup: 👉 PathFinders Web App: https://pathfinders-frontend.onrender.com/
 
 🔧 Getting Started (Local Setup)
 1. Clone the Repository
@@ -66,3 +66,4 @@ Ensure your IP Address is whitelisted in MongoDB.
 🌟 Contributing
 
 We welcome feedback, feature suggestions, and contributions! Feel free to fork the repo, open an issue, or submit a PR.
+
