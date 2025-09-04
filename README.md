@@ -1,40 +1,68 @@
-# PathFinders
-Generate suitable running routes based on user preferences, customized to individual users
+PathFinders 🏃‍♂️🌍
 
-Current Progress:
-- Integrated Frontend and Backend for Milestone 1
-- Routing logic for loop routes and Point-to-Point routes
-- Improved accuracy (prevention of non-walkable routes and restricted areas)
+Generate suitable running routes based on user preferences — customized to every individual.
 
-## 🔧 Getting Started (Local Setup)
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/darrensimmx/PathFinders.git
-   OR
-   git pull
-2. **Install Dependencies**
-    - npm run setup
-3. **Run the Project**
-    - npm start 
-   
-Testing:
-- npm install --save-dev jest supertest
-- ensure that in packagejson, under "scripts", there is "test": "jest". Else, add it in.
+Try it out without setup: 👉 PathFinders Web App
+
+🔧 Getting Started (Local Setup)
+1. Clone the Repository
+git clone https://github.com/darrensimmx/PathFinders.git
+cd PathFinders
+
+2. Install Dependencies
+npm run setup
+
+3. Run the Project
+npm start
 
 
+Frontend will run on localhost:5173
+Backend will run on localhost:4000
+
+Note: We use CORS since a single port cannot run multiple servers.
+
+🧪 Testing
+
+Install testing dependencies:
+
+npm install --save-dev jest supertest
 
 
-**Local Host**
-FrontEnd should run on localhost:5173 while BackEnd runs on localhost:4000 
-=> we don't use same host as one port can only run one server (hence the use of cors to integrate the different hosts)
+Make sure your package.json includes:
+
+"scripts": {
+  "test": "jest"
+}
 
 
-- client side might need to npm install react-icons
-- client side might need to npm install cypress --save-dev
-- BackEnd.server might need to npm install mongoose
-- Backend server might need npm i bcrypt
-- Backend server might need npm install --save-dev mongodb-memory-server
-- Backend server might need npm install jsonwebtoken cookie-parser
-- Backend server might need npm install nodemailer
+Run tests:
 
-- Need to make sure IP Address is whitelisted to MongoDB
+npm test
+
+⚙️ Additional Setup Notes
+
+Client-side:
+
+npm install react-icons
+
+npm install cypress --save-dev
+
+Backend:
+
+npm install mongoose
+
+npm install bcrypt
+
+npm install --save-dev mongodb-memory-server
+
+npm install jsonwebtoken cookie-parser
+
+npm install nodemailer
+
+Database:
+
+Ensure your IP Address is whitelisted in MongoDB.
+
+🌟 Contributing
+
+We welcome feedback, feature suggestions, and contributions! Feel free to fork the repo, open an issue, or submit a PR.
